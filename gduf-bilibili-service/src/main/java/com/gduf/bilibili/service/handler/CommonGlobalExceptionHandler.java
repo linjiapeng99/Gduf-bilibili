@@ -1,8 +1,7 @@
 package com.gduf.bilibili.service.handler;
 
-import com.gduf.bilibili.dao.domain.JsonResponse;
-import com.gduf.bilibili.dao.exception.ConditionException;
-import org.springframework.context.annotation.Configuration;
+import com.gduf.bilibili.domain.JsonResponse;
+import com.gduf.bilibili.exception.ConditionException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ControllerAdvice;

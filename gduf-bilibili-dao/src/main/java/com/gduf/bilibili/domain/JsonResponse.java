@@ -1,4 +1,4 @@
-package com.gduf.bilibili.dao.domain;
+package com.gduf.bilibili.domain;
 
 public class JsonResponse<T> {
     private String code;
@@ -20,7 +20,7 @@ public class JsonResponse<T> {
         return new JsonResponse<>(null);
     }
 
-    public static JsonResponse<String>success(String data){
+    public static <T> JsonResponse<T>success(T data){
         return new JsonResponse<>(data);
     }
 

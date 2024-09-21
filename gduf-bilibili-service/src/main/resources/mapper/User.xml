@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.UserDao">
+    <select id="getUserByPhone" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.User">
+        select * from t_user where phone=#{phone}
+    </select>
+    <select id="getUserById" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.User">
+        select * from t_user where id=#{id}
+    </select>
+    <select id="getUserInfoByUserId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserInfo">
+        select * from t_user_info where userId=#{userId}
+    </select>
+
+    <insert id="addUser" parameterType="com.gduf.bilibili.domain.User"  useGeneratedKeys="true" keyProperty="id">
+        insert into
+            t_user(phone,email, password, salt, createTime)
+        values(#{phone},#{email},#{password},#{salt},#{createTime})
+    </insert>
+    <insert id="addUserInfo" parameterType="com.gduf.bilibili.domain.UserInfo">
+        insert into
+            t_user_info(userId, nick, avatar, sign, gender, birth, createTime)
+        values(#{userId},#{nick},#{avatar},#{sign},#{gender},#{birth},#{createTime})
+    </insert>
+</mapper>

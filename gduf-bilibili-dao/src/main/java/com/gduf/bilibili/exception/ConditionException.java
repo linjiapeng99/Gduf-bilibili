@@ -1,4 +1,4 @@
-package com.gduf.bilibili.dao.exception;
+package com.gduf.bilibili.exception;
 
 public class ConditionException extends RuntimeException{
     private static final long serialVersionUID=1L;

@@ -1,0 +1,20 @@
+package com.gduf.bilibili.dao;
+
+import com.gduf.bilibili.domain.User;
+import com.gduf.bilibili.domain.UserInfo;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+@Mapper
+public interface UserDao {
+    //根据手机号查找用户
+    User getUserByPhone(String phone);
+
+    Integer addUser(User user);
+
+    Integer addUserInfo(UserInfo userInfo);
+
+    User getUserById(Long id);
+
+    UserInfo getUserInfoByUserId(Long userId);
+}
