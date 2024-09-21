@@ -1,24 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gduf.bilibili.dao.UserDao">
+    <!--根据电话号码查询用户-->
     <select id="getUserByPhone" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.User">
         select * from t_user where phone=#{phone}
     </select>
+    <!--根据用户id查询用户-->
     <select id="getUserById" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.User">
         select * from t_user where id=#{id}
     </select>
+    <!--根据用户id查询用户信息-->
     <select id="getUserInfoByUserId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserInfo">
         select * from t_user_info where userId=#{userId}
     </select>
-
+    <!--根据手机号或者邮箱查询用户-->
+    <select id="getUserByPhoneOrEmail" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.User">
+        select * from
+            (select concat(phone,ifnull(email,''))as pe,u.*from t_user as u) as tmp
+        where tmp.pe like '%${phoneOrEmail}%'
+    </select>
+    <!--新增用户-->
     <insert id="addUser" parameterType="com.gduf.bilibili.domain.User"  useGeneratedKeys="true" keyProperty="id">
         insert into
             t_user(phone,email, password, salt, createTime)
         values(#{phone},#{email},#{password},#{salt},#{createTime})
     </insert>
+    <!--添加用户信息-->
     <insert id="addUserInfo" parameterType="com.gduf.bilibili.domain.UserInfo">
         insert into
             t_user_info(userId, nick, avatar, sign, gender, birth, createTime)
         values(#{userId},#{nick},#{avatar},#{sign},#{gender},#{birth},#{createTime})
     </insert>
+    <!--更新用户信息-->
+    <update id="updateUsers" parameterType="com.gduf.bilibili.domain.User">
+        update t_user
+            set
+            <if test="phone!=null and phone!=''">
+                phone=#{phone},
+            </if>
+            <if test="email!=null and email!=''">
+                email=#{email},
+            </if>
+            <if test="password!=null and password!=''">
+                password=#{password},
+            </if>
+            updateTime=#{updateTime}
+        where id=#{id}
+    </update>
 </mapper>

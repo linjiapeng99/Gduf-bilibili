@@ -6,10 +6,7 @@ import com.gduf.bilibili.domain.User;
 import com.gduf.bilibili.service.UserService;
 import com.gduf.bilibili.service.util.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserApi {
@@ -27,7 +24,6 @@ public class UserApi {
         String pk = RSAUtil.getPublicKeyStr();
         return JsonResponse.success(pk);
     }
-
     /**
      * 用户注册
      *
@@ -39,7 +35,6 @@ public class UserApi {
         userService.addUser(user);
         return JsonResponse.success();
     }
-
     /**
      * 用户登录
      * @param user
@@ -51,7 +46,6 @@ public class UserApi {
         String token = userService.login(user);
         return JsonResponse.success(token);
     }
-
     /**
      * 获取用户信息
      * @return
@@ -61,5 +55,18 @@ public class UserApi {
         Long userId = userSupport.getCurrentUserId();
         User user=userService.getUserInfo(userId);
         return JsonResponse.success(user);
+    }
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @return
+     */
+    @PutMapping("/users")
+    public JsonResponse<String>updateUsers(@RequestBody User user) throws Exception {
+        Long userId = userSupport.getCurrentUserId();
+        user.setId(userId);
+        userService.updateUsers(user);
+        return JsonResponse.success();
     }
 }

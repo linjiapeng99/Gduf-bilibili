@@ -21,6 +21,7 @@ public class UserService {
 
     /**
      * 用户注册
+     *
      * @param user
      */
     public void addUser(User user) {
@@ -59,6 +60,7 @@ public class UserService {
 
     /**
      * 根据手机号获取用户
+     *
      * @param phone
      * @return
      */
@@ -68,16 +70,20 @@ public class UserService {
 
     /**
      * 用户登录
+     *
      * @param user
      * @return
      * @throws Exception
      */
     public String login(User user) throws Exception {
-        String phone = user.getPhone();
-        if (StringUtils.isNullOrEmpty(phone)) {
-            throw new ConditionException("手机号不能为空！");
+        String phone = user.getPhone() == null ? "" : user.getPhone();
+        String email = user.getEmail() == null ? "" : user.getEmail();
+        if (StringUtils.isNullOrEmpty(phone) && StringUtils.isNullOrEmpty(email)) {
+            throw new ConditionException("参数错误！");
         }
-        User dbUser = this.getUserByPhone(phone);
+        //User dbUser = this.getUserByPhone(phone);
+        String phoneOrEmail = phone + email;
+        User dbUser = this.getUserByPhoneOrEmail(phoneOrEmail);
         String password = user.getPassword();
         String rawPassword;
         try {
@@ -94,14 +100,44 @@ public class UserService {
     }
 
     /**
+     * 根据手机号或者邮箱查询用户
+     * @param phoneOrEmail
+     * @return
+     */
+    public User getUserByPhoneOrEmail(String phoneOrEmail) {
+        return userDao.getUserByPhoneOrEmail(phoneOrEmail);
+    }
+
+    /**
      * 获取用户信息
+     *
      * @param userId
      * @return
      */
     public User getUserInfo(Long userId) {
         User user = userDao.getUserById(userId);
-        UserInfo userInfo=userDao.getUserInfoByUserId(userId);
+        UserInfo userInfo = userDao.getUserInfoByUserId(userId);
         user.setUserInfo(userInfo);
         return user;
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param user
+     */
+    public void updateUsers(User user) throws Exception {
+        Long userId = user.getId();
+        User dbUser = userDao.getUserById(userId);
+        if (dbUser == null) {
+            throw new ConditionException("用户不存在！");
+        }
+        if (!StringUtils.isNullOrEmpty(user.getPassword())) {
+            String rawPassword = RSAUtil.decrypt(user.getPassword());
+            String md5Password = MD5Util.sign(rawPassword, dbUser.getSalt(), "UTF-8");
+            user.setPassword(md5Password);
+        }
+        user.setUpdateTime(new Date());
+        userDao.updateUsers(user);
     }
 }
