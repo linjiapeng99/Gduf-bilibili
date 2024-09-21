@@ -140,4 +140,13 @@ public class UserService {
         user.setUpdateTime(new Date());
         userDao.updateUsers(user);
     }
+
+    /**
+     * 更新用户账户信息
+     * @param userInfo
+     */
+    public void updateUserInfo(UserInfo userInfo) {
+        userInfo.setUpdateTime(new Date());
+        userDao.updateUserInfo(userInfo);
+    }
 }

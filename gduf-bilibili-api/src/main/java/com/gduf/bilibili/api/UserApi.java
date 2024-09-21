@@ -3,6 +3,7 @@ package com.gduf.bilibili.api;
 import com.gduf.bilibili.api.support.UserSupport;
 import com.gduf.bilibili.domain.JsonResponse;
 import com.gduf.bilibili.domain.User;
+import com.gduf.bilibili.domain.UserInfo;
 import com.gduf.bilibili.service.UserService;
 import com.gduf.bilibili.service.util.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class UserApi {
     public JsonResponse<String> login(@RequestBody User user) throws Exception {
         String token = userService.login(user);
         return JsonResponse.success(token);
+
     }
     /**
      * 获取用户信息
@@ -67,6 +69,19 @@ public class UserApi {
         Long userId = userSupport.getCurrentUserId();
         user.setId(userId);
         userService.updateUsers(user);
+        return JsonResponse.success();
+    }
+
+    /**
+     * 更新用户账户信息
+     * @param userInfo
+     * @return
+     */
+    @PutMapping("/user-infos")
+    public JsonResponse<String>updateUserInfo(@RequestBody UserInfo userInfo){
+        Long userId=userSupport.getCurrentUserId();
+        userInfo.setUserId(userId);
+        userService.updateUserInfo(userInfo);
         return JsonResponse.success();
     }
 }
