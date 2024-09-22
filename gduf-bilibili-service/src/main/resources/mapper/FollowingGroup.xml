@@ -12,6 +12,6 @@
     <!--根据用户id查询关注分类-->
     <select id="getByUserId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.FollowingGroup">
         select * from t_following_group
-        where userId=#{userId} or 'type' in ('0','1','2')
+        where userId=#{userId} or type in ('0','1','2')
     </select>
 </mapper>

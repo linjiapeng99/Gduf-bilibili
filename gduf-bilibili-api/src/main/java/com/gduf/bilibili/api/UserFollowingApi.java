@@ -1,5 +1,6 @@
 package com.gduf.bilibili.api;
 
+import com.gduf.bilibili.api.support.UserSupport;
 import com.gduf.bilibili.domain.FollowingGroup;
 import com.gduf.bilibili.domain.JsonResponse;
 import com.gduf.bilibili.domain.UserFollowing;
@@ -17,6 +18,8 @@ public class UserFollowingApi {
     @Autowired
     private UserFollowingService userFollowingService;
 
+    @Autowired
+    private UserSupport userSupport;
     /**
      * 新增关注记录
      * @param userFollowing
@@ -30,12 +33,23 @@ public class UserFollowingApi {
 
     /**
      * 查询关注列表
-     * @param userId
      * @return
      */
     @GetMapping("/user-followings")
-    public JsonResponse<List<FollowingGroup>>getUserFollowings(Long userId){
+    public JsonResponse<List<FollowingGroup>>getUserFollowings(){
+        Long userId = userSupport.getCurrentUserId();
         List<FollowingGroup> userFollowings = userFollowingService.getUserFollowings(userId);
         return JsonResponse.success(userFollowings);
+    }
+
+    /**
+     * 获取粉丝列表
+     * @return
+     */
+    @GetMapping("/user-fans")
+    public JsonResponse<List<UserFollowing>>getUserFans(){
+        Long userId = userSupport.getCurrentUserId();
+        List<UserFollowing> userFans = userFollowingService.getUserFans(userId);
+        return JsonResponse.success(userFans);
     }
 }

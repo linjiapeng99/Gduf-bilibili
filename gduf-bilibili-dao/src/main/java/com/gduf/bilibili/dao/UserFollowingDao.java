@@ -1,5 +1,6 @@
 package com.gduf.bilibili.dao;
 
+import com.gduf.bilibili.domain.FollowingGroup;
 import com.gduf.bilibili.domain.UserFollowing;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,4 +15,6 @@ public interface UserFollowingDao {
     Integer addUserFollowings(UserFollowing userFollowing);
 
     List<UserFollowing> getUserFollowings(Long userId);
+
+    List<UserFollowing> getUserFans(Long userId);
 }

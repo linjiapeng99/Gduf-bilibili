@@ -15,4 +15,8 @@
     <select id="getUserFollowings" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserFollowing">
         select * from t_user_following where userId=#{userId}
     </select>
+    <!--根据userId获取用户粉丝-->
+    <select id="getUserFans" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserFollowing">
+        select * from t_user_following where followingId=#{userId}
+    </select>
 </mapper>

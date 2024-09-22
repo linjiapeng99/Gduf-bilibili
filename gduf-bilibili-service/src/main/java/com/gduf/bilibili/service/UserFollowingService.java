@@ -62,6 +62,7 @@ public class UserFollowingService {
      * 第一步：获取关注用户列表
      * 第二步：根据关注用户的id查询关注用户的基本信息
      * 第三步：将关注用户按关注分组进行分类
+     *
      * @param userId
      * @return
      */
@@ -69,7 +70,7 @@ public class UserFollowingService {
         //获取用户关注记录
         List<UserFollowing> list = userFollowingDao.getUserFollowings(userId);
         //获取用户关注记录的用户id
-        Set<Long> followingIdSet = list.stream().map(UserFollowing::getUserId).collect(Collectors.toSet());
+        Set<Long> followingIdSet = list.stream().map(UserFollowing::getFollowingId).collect(Collectors.toSet());
         List<UserInfo> userInfoList = new ArrayList<>();
         //获取用户关注的up主的账户信息
         if (!followingIdSet.isEmpty()) {
@@ -78,24 +79,24 @@ public class UserFollowingService {
         //关注的用户的信息匹配
         for (UserFollowing userFollowing : list) {
             for (UserInfo userInfo : userInfoList) {
-                if(userFollowing.getFollowingId().equals(userInfo.getUserId())){
+                if (userFollowing.getFollowingId().equals(userInfo.getUserId())) {
                     userFollowing.setUserInfo(userInfo);
                 }
             }
         }
         //获取用户相关的关注分类
-        List<FollowingGroup>groupList=followingGroupService.getByUserId(userId);
+        List<FollowingGroup> groupList = followingGroupService.getByUserId(userId);
         //创建一个默认全部关注
-        FollowingGroup allGroup=new FollowingGroup();
+        FollowingGroup allGroup = new FollowingGroup();
         allGroup.setName(UserContant.USER_FOLLOWING_GROUP_ALL_NAME);
         //将用户关注的所有up主的信息全都设置进去全部关注的分组中
         allGroup.setFollowingUserInfoList(userInfoList);
-        List<FollowingGroup>result=new ArrayList<>();
+        List<FollowingGroup> result = new ArrayList<>();
         result.add(allGroup);
         for (FollowingGroup group : groupList) {
-            List<UserInfo>infoList=new ArrayList<>();
+            List<UserInfo> infoList = new ArrayList<>();
             for (UserFollowing userFollowing : list) {
-                if(group.getId().equals(userFollowing.getGroupId())){
+                if (group.getId().equals(userFollowing.getGroupId())) {
                     infoList.add(userFollowing.getUserInfo());
                 }
             }
@@ -103,5 +104,43 @@ public class UserFollowingService {
             result.add(group);
         }
         return result;
+    }
+
+    /**
+     * 获取用户粉丝列表
+     *第一步：获取当前用户的粉丝列表
+     * 第二步：根据粉丝的用户id获取粉丝的账户信息
+     * 第三步：查询当前用户是否与粉丝互粉
+     * @param userId
+     * @return
+     */
+    public List<UserFollowing> getUserFans(Long userId) {
+        //获取粉丝记录
+        List<UserFollowing> fanList = userFollowingDao.getUserFans(userId);
+        Set<Long> fanIdSet = fanList.stream().map(UserFollowing::getUserId).collect(Collectors.toSet());
+        //获取我的关注列表
+        List<UserFollowing> followingList = userFollowingDao.getUserFollowings(userId);
+        List<UserInfo>userInfoList=new ArrayList<>();
+        //设置粉丝的账户信息
+        if(!fanIdSet.isEmpty()){
+            userInfoList=userService.getUserInfoByUserIds(fanIdSet);
+        }
+
+        for (UserFollowing fan : fanList) {
+            //匹配粉丝对应的账户信息
+            for (UserInfo userInfo : userInfoList) {
+                if(fan.getUserId().equals(userInfo.getUserId())){
+                    userInfo.setFollowed(false);
+                    fan.setUserInfo(userInfo);
+                }
+            }
+            //遍历我的关注，匹配我与粉丝是否互粉
+            for (UserFollowing userFollowing : followingList) {
+                if(userFollowing.getFollowingId().equals(fan.getUserId())){
+                    fan.getUserInfo().setFollowed(true);
+                }
+            }
+        }
+        return fanList;
     }
 }
