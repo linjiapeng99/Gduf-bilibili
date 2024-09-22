@@ -80,4 +80,22 @@
                 </foreach>
             </if>
     </select>
+    <!--查询用户账户信息总数量-->
+    <select id="pageCountUserInfos" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1) from t_user_info
+            where 1=1
+            <if test="nick!=null and nick!=''">
+                and nick like '%${nick}%'
+            </if>
+    </select>
+    <!--分页加条件查询用户账户信息-->
+    <select id="pageListUserInfos" parameterType="java.util.Map" resultType="com.gduf.bilibili.domain.UserInfo">
+        select * from t_user_info
+            where 1=1
+            <if test="nicl!=null and nick!=''">
+                and nick like '%${nick}%'
+            </if>
+            order by id desc
+            limit #{start},#{limit}
+    </select>
 </mapper>

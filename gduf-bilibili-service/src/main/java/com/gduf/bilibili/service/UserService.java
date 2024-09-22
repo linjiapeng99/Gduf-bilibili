@@ -1,6 +1,8 @@
 package com.gduf.bilibili.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gduf.bilibili.dao.UserDao;
+import com.gduf.bilibili.domain.PageResult;
 import com.gduf.bilibili.domain.User;
 import com.gduf.bilibili.domain.UserInfo;
 import com.gduf.bilibili.domain.constant.UserContant;
@@ -12,6 +14,7 @@ import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -156,6 +159,7 @@ public class UserService {
 
     /**
      * 根据用户id获取用户
+     *
      * @param followingId
      * @return
      */
@@ -165,5 +169,18 @@ public class UserService {
 
     public List<UserInfo> getUserInfoByUserIds(Set<Long> userIds) {
         return userDao.getUserInfoByUserIds(userIds);
+    }
+
+    public PageResult<UserInfo> pageListUserInfos(JSONObject param) {
+        Integer pageNum = param.getInteger("pageNum");
+        Integer pageSize = param.getInteger("pageSize");
+        param.put("start", (pageNum - 1) * pageSize);
+        param.put("limit", pageSize);
+        Integer total = userDao.pageCountUserInfos(param);
+        List<UserInfo> list = new ArrayList<>();
+        if (total > 0) {
+            list = userDao.pageListUserInfos(param);
+        }
+        return new PageResult<>(total,list);
     }
 }
