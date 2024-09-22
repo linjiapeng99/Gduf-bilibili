@@ -5,6 +5,9 @@ import com.gduf.bilibili.domain.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+import java.util.Set;
+
 @Mapper
 public interface UserDao {
     //根据手机号查找用户
@@ -23,4 +26,6 @@ public interface UserDao {
     User getUserByPhoneOrEmail(String phoneOrEmail);
 
     void updateUserInfo(UserInfo userInfo);
+
+    List<UserInfo> getUserInfoByUserIds(Set<Long> userIdList);
 }

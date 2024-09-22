@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -101,6 +103,7 @@ public class UserService {
 
     /**
      * 根据手机号或者邮箱查询用户
+     *
      * @param phoneOrEmail
      * @return
      */
@@ -143,10 +146,24 @@ public class UserService {
 
     /**
      * 更新用户账户信息
+     *
      * @param userInfo
      */
     public void updateUserInfo(UserInfo userInfo) {
         userInfo.setUpdateTime(new Date());
         userDao.updateUserInfo(userInfo);
+    }
+
+    /**
+     * 根据用户id获取用户
+     * @param followingId
+     * @return
+     */
+    public User getById(Long followingId) {
+        return userDao.getUserById(followingId);
+    }
+
+    public List<UserInfo> getUserInfoByUserIds(Set<Long> userIds) {
+        return userDao.getUserInfoByUserIds(userIds);
     }
 }

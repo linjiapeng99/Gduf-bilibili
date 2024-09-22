@@ -42,7 +42,7 @@ public class UserApi {
      * @return
      * @throws Exception
      */
-    @PostMapping("user-tokens")
+    @PostMapping("/user-tokens")
     public JsonResponse<String> login(@RequestBody User user) throws Exception {
         String token = userService.login(user);
         return JsonResponse.success(token);

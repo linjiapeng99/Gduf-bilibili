@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.UserFollowingDao">
+    <!--根据用户id和关注用户id删除关注记录-->
+    <delete id="deleteUserFollowing">
+        delete from t_user_following where userId=#{userId} and followingId=#{followingId}
+    </delete>
+    <!--新添加关注记录-->
+    <insert id="addUserFollowings" parameterType="com.gduf.bilibili.domain.UserFollowing">
+        insert into t_user_following
+        (userId, followingId, groupId, createTime)
+        value (#{userId},#{followingId},#{groupId},#{createTime})
+    </insert>
+    <!--根据userId查询用户关注记录-->
+    <select id="getUserFollowings" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserFollowing">
+        select * from t_user_following where userId=#{userId}
+    </select>
+</mapper>
