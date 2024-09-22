@@ -143,4 +143,15 @@ public class UserFollowingService {
         }
         return fanList;
     }
+
+    public Long addUserFollowingGroups(FollowingGroup followingGroup) {
+        followingGroup.setCreateTime(new Date());
+        followingGroup.setType(UserContant.FOLLOWING_GROUP_TYPE_USER);
+        followingGroupService.addUserFollowingGroups(followingGroup);
+        return followingGroup.getId();
+    }
+
+    public List<FollowingGroup> getUserFollowingGroups(Long userId) {
+        return followingGroupService.getUserFollowingGroups(userId);
+    }
 }

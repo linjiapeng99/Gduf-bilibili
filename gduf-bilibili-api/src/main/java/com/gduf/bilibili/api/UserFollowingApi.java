@@ -20,23 +20,26 @@ public class UserFollowingApi {
 
     @Autowired
     private UserSupport userSupport;
+
     /**
      * 新增关注记录
+     *
      * @param userFollowing
      * @return
      */
     @PostMapping("/user-followings")
-    public JsonResponse<String>addUserFollowings(@RequestBody UserFollowing userFollowing){
+    public JsonResponse<String> addUserFollowings(@RequestBody UserFollowing userFollowing) {
         userFollowingService.addUserFollowings(userFollowing);
         return JsonResponse.success();
     }
 
     /**
      * 查询关注列表
+     *
      * @return
      */
     @GetMapping("/user-followings")
-    public JsonResponse<List<FollowingGroup>>getUserFollowings(){
+    public JsonResponse<List<FollowingGroup>> getUserFollowings() {
         Long userId = userSupport.getCurrentUserId();
         List<FollowingGroup> userFollowings = userFollowingService.getUserFollowings(userId);
         return JsonResponse.success(userFollowings);
@@ -44,12 +47,28 @@ public class UserFollowingApi {
 
     /**
      * 获取粉丝列表
+     *
      * @return
      */
     @GetMapping("/user-fans")
-    public JsonResponse<List<UserFollowing>>getUserFans(){
+    public JsonResponse<List<UserFollowing>> getUserFans() {
         Long userId = userSupport.getCurrentUserId();
         List<UserFollowing> userFans = userFollowingService.getUserFans(userId);
         return JsonResponse.success(userFans);
+    }
+
+    @PostMapping("/user-following-groups")
+    public JsonResponse<Long> addFollowingGroups(@RequestBody FollowingGroup followingGroup) {
+        Long userId = userSupport.getCurrentUserId();
+        followingGroup.setUserId(userId);
+        Long groupId = userFollowingService.addUserFollowingGroups(followingGroup);
+        return JsonResponse.success(groupId);
+    }
+
+    @GetMapping("/user-following-groups")
+    public JsonResponse<List<FollowingGroup>> getFollowingGroups() {
+        Long userId = userSupport.getCurrentUserId();
+        List<FollowingGroup> list = userFollowingService.getUserFollowingGroups(userId);
+        return JsonResponse.success(list);
     }
 }
