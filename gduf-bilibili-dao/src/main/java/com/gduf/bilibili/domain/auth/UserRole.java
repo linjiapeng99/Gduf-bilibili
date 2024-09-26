@@ -9,6 +9,26 @@ public class UserRole {
 
     private Long roleId;
 
+    private String roleName;
+
+    private String roleCode;
+
+    public String getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
     private Date createTime;
 
     public Date getCreateTime() {
