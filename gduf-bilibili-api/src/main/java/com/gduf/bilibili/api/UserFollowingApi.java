@@ -57,6 +57,11 @@ public class UserFollowingApi {
         return JsonResponse.success(userFans);
     }
 
+    /**
+     * 添加关注分类分组
+     * @param followingGroup
+     * @return
+     */
     @PostMapping("/user-following-groups")
     public JsonResponse<Long> addFollowingGroups(@RequestBody FollowingGroup followingGroup) {
         Long userId = userSupport.getCurrentUserId();
@@ -65,6 +70,10 @@ public class UserFollowingApi {
         return JsonResponse.success(groupId);
     }
 
+    /**
+     * 查询官族分类分组
+     * @return
+     */
     @GetMapping("/user-following-groups")
     public JsonResponse<List<FollowingGroup>> getFollowingGroups() {
         Long userId = userSupport.getCurrentUserId();
