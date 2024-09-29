@@ -3,6 +3,8 @@ package com.gduf.bilibili.api;
 import com.gduf.bilibili.api.support.UserSupport;
 import com.gduf.bilibili.domain.JsonResponse;
 import com.gduf.bilibili.domain.UserMoments;
+import com.gduf.bilibili.domain.annotation.ApiLiitedRole;
+import com.gduf.bilibili.domain.constant.AuthRoleConstant;
 import com.gduf.bilibili.service.UserMomentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,7 @@ public class UserMomentsApi {
      * @return
      * @throws Exception
      */
+    @ApiLiitedRole(limitedRoleCodeList = {AuthRoleConstant.ROLE_LV0})
     @PostMapping("/user-moments")
     public JsonResponse<String> addUserMoments(@RequestBody UserMoments userMoments) throws Exception {
         Long userId = userSupport.getCurrentUserId();
