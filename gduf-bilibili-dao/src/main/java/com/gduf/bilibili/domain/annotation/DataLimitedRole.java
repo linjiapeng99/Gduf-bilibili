@@ -1,7 +1,6 @@
 package com.gduf.bilibili.domain.annotation;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.annotation.*;
 
@@ -9,6 +8,5 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Documented
 @Component
-public @interface ApiLiitedRole {
-    String[]limitedRoleCodeList()default {};
+public @interface DataLimitedRole {
 }

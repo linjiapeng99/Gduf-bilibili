@@ -101,6 +101,13 @@ public class UserApi {
         return JsonResponse.success();
     }
 
+    /**
+     * 获取用户信息
+     * @param pageNum
+     * @param pageSize
+     * @param nick
+     * @return
+     */
     @GetMapping("/user-infos")
     public JsonResponse<PageResult<UserInfo>> pageListUserInfos(@RequestParam Integer pageNum, @RequestParam Integer pageSize, String nick) {
         Long userId = userSupport.getCurrentUserId();

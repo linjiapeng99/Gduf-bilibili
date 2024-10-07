@@ -2,8 +2,6 @@ package com.gduf.bilibili.service;
 
 import com.gduf.bilibili.dao.FollowingGroupDao;
 import com.gduf.bilibili.domain.FollowingGroup;
-import com.gduf.bilibili.domain.UserFollowing;
-import com.gduf.bilibili.domain.constant.UserContant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

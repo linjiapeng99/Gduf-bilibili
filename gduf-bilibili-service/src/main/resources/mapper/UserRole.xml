@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gduf.bilibili.dao.UserRoleDao">
-
+    <!--根据id获取用户角色-->
     <select id="getUserRoleByUserId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.auth.UserRole">
         select
             ur.*,
@@ -13,4 +13,12 @@
             where
                  ur.userId=#{userId}
     </select>
+    <!--添加用户角色 -->
+    <insert id="addUserRole">
+        insert into
+            t_user_role
+            (userId, roleId, createTime)
+        values
+            (#{userId},#{roleId},#{createTime})
+    </insert>
 </mapper>

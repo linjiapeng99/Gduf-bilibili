@@ -23,6 +23,8 @@ import java.util.Set;
 public class UserService {
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private UserAuthService userAuthService;
 
     /**
      * 用户注册
@@ -61,6 +63,8 @@ public class UserService {
         userInfo.setGender(UserContant.GENDER_MALE);
         userInfo.setCreateTime(now);
         userDao.addUserInfo(userInfo);
+        //添加用户默认角色
+        userAuthService.addUserDefaultRole(user.getId());
     }
 
     /**
@@ -159,7 +163,6 @@ public class UserService {
 
     /**
      * 根据用户id获取用户
-     *
      * @param followingId
      * @return
      */
