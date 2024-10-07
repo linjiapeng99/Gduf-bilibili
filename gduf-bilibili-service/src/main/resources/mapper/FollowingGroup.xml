@@ -16,7 +16,7 @@
     </select>
     <!--新增自定义关注分组-->
     <insert id="addUserFollowingGroups" parameterType="com.gduf.bilibili.domain.FollowingGroup" useGeneratedKeys="true" keyProperty="id">
-        insert into t_following_group(userId, 'name', 'type', createTime)
+        insert into t_following_group(userId, name, type, createTime)
         value (#{userId},#{name},#{type},#{createTime})
     </insert>
     <!--查询关注分组-->

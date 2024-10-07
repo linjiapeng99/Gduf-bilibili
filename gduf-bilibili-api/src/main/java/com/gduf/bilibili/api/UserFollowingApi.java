@@ -71,7 +71,7 @@ public class UserFollowingApi {
     }
 
     /**
-     * 查询官族分类分组
+     * 查询关注分类分组
      * @return
      */
     @GetMapping("/user-following-groups")
