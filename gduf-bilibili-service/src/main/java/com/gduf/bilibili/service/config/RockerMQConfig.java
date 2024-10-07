@@ -64,7 +64,7 @@ public class RockerMQConfig {
                 List<UserFollowing> userFans = userFollowingService.getUserFans(userId);
                 for (UserFollowing fan : userFans) {
                     //获取用户订阅的其他up主动态
-                    String key="subscribed-"+fan.getUserId();
+                    String key="subscribed-"+fan.getFollowingId();
                     String subScribedListStr = redisTemplate.opsForValue().get(key);
                     List<UserMoments>subScribedList;
                     if(StringUtils.isNullOrEmpty(subScribedListStr)){

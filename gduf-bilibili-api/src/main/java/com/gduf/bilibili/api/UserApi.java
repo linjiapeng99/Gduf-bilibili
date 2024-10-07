@@ -13,7 +13,10 @@ import com.gduf.bilibili.service.util.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.Oneway;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserApi {
@@ -103,6 +106,7 @@ public class UserApi {
 
     /**
      * 获取用户信息
+     *
      * @param pageNum
      * @param pageSize
      * @param nick
@@ -117,10 +121,46 @@ public class UserApi {
         param.put("pageSize", pageSize);
         param.put("nick", nick);
         PageResult<UserInfo> result = userService.pageListUserInfos(param);
-        if(result.getTotal()>0){
-           List<UserInfo>checkFollowingUserInfoList= userFollowingService.checkFollowingStatus(result.getList(),userId);
-           result.setList(checkFollowingUserInfoList);
+        if (result.getTotal() > 0) {
+            List<UserInfo> checkFollowingUserInfoList = userFollowingService.checkFollowingStatus(result.getList(), userId);
+            result.setList(checkFollowingUserInfoList);
         }
         return JsonResponse.success(result);
+    }
+
+    /**
+     * 双令牌登录
+     * @param user
+     * @return
+     */
+    @PostMapping("/user-dts")
+    public JsonResponse<Map<String, Object>> loginForDts(@RequestBody User user) throws Exception {
+        Map<String, Object> map = userService.loginForDts(user);
+        return JsonResponse.success(map);
+    }
+
+    /**
+     * 用户登出，删除数据库中的刷新令牌
+     * @param request
+     * @return
+     */
+    @DeleteMapping("/refresh-tokens")
+    public JsonResponse<String>logout(HttpServletRequest request){
+        String refreshToken=request.getHeader("refreshToken");
+        Long userId=userSupport.getCurrentUserId();
+        userService.logout(refreshToken,userId);
+        return JsonResponse.success();
+    }
+
+    /**
+     * 刷新用户令牌
+     * @param request
+     * @return
+     */
+    @PostMapping("/access-tokens")
+    public JsonResponse<String>refreshAccessToken(HttpServletRequest request) throws Exception {
+        String refreshToken = request.getHeader("refreshToken");
+        String accessToken=userService.refreshToken(refreshToken);
+        return JsonResponse.success(accessToken);
     }
 }

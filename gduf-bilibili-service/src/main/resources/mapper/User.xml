@@ -98,4 +98,22 @@
             order by id desc
             limit #{start},#{limit}
     </select>
+    <!--根据refreshToken和userId删除令牌记录-->
+    <delete id="deleteRefreshToken">
+        delete from t_refresh_token
+            where refreshToken=#{refreshToken} and userId=#{userId}
+    </delete>
+    <!--添加用户刷新的令牌-->
+    <insert id="addRefreshToken">
+        insert into
+            t_refresh_token(userId, refreshToken, createTime)
+        values
+            (#{userId},#{refreshToken},#{createTime})
+    </insert>
+    <!--获取数据库中用户的刷新令牌-->
+    <select id="getRefreshTokenDetail" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.RefreshTokenDetail">
+        select * from
+                t_refresh_token
+        where refreshToken=#{refreshToken}
+    </select>
 </mapper>

@@ -1,11 +1,14 @@
 package com.gduf.bilibili.dao;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gduf.bilibili.domain.RefreshTokenDetail;
 import com.gduf.bilibili.domain.User;
 import com.gduf.bilibili.domain.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,4 +37,10 @@ public interface UserDao {
     Integer pageCountUserInfos(Map<String, Object> param);
 
     List<UserInfo> pageListUserInfos(Map<String, Object> param);
+
+    void deleteRefreshToken(@Param("refreshToken") String refreshToken,@Param("userId") Long userId);
+
+    void addRefreshToken(@Param("refreshToken") String refreshToken,@Param("userId") Long userId,@Param("createTime") Date createTime);
+
+    RefreshTokenDetail getRefreshTokenDetail(String refreshToken);
 }
