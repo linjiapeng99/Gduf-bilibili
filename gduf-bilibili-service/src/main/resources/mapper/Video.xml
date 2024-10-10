@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.VideoDao">
+    <!--新增视频-->
+    <insert id="addVideos" parameterType="com.gduf.bilibili.domain.Video" useGeneratedKeys="true" keyProperty="id">
+        insert into
+            t_video(userId,
+                    url,
+                    thumbnail,
+                    title,
+                    type,
+                    duration,
+                    area,
+                    description,
+                    createTime)
+        values (
+                #{userId},
+                #{url},
+                #{thumbnail},
+                #{title},
+                #{type},
+                #{duration},
+                #{area},
+                #{description},
+                #{createTime}
+        )
+    </insert>
+    <!--新增视频标签-->
+    <insert id="batchAddVideoTags" parameterType="java.util.List">
+        insert into
+            t_video_tag
+        (videoId, tagId, createTime)
+        values 
+            <foreach collection="tagList" item="videoTag" separator=",">
+                (#{videoTag.videoId},#{tagId},#{createTime})
+            </foreach>
+    </insert>
+    <!--查询视频条数-->
+    <select id="pageCountVideo" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+            count(1)
+        from
+            t_video
+        where
+            1=1
+            <if test="area!=null and area!=''">
+                and area=#{area}
+            </if>
+    </select>
+    <!--查询视频记录-->
+    <select id="pageListVideos" parameterType="java.util.Map" resultType="com.gduf.bilibili.domain.Video">
+        select *
+            from
+            t_video
+        where
+            1=1
+            <if test="area!=null and area!=''">
+                and area=#{area}
+            </if>
+    </select>
+</mapper>
