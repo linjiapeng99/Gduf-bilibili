@@ -8,10 +8,15 @@ import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.*;
-
+@Component
 public class FastDFSUtil {
     @Autowired
     private FastFileStorageClient fastFileStorageClient;
@@ -30,6 +35,8 @@ public class FastDFSUtil {
 
     private static final String UPLOAD_NO_KEY="upload-no-key:";
 
+    //文件分片默认大小
+    private static final int SLICE_SIZE=1024*1024*2;
     //获取文件类型
     public String getFileType(MultipartFile file){
         if(file==null){
@@ -127,6 +134,41 @@ public class FastDFSUtil {
             redisTemplate.delete(keyList);
         }
         return resultPath;
+    }
+
+    //文件分片
+    public void convertFileToSlices(MultipartFile multipartFile) throws Exception {
+        String fileType = this.getFileType(multipartFile);
+        File file=this.multipartFileToFile(multipartFile);
+        long fileLength = file.length();
+        int count=1;
+        for(int i=0;i<fileLength;i+=SLICE_SIZE){
+            //支持文件位置随机访问
+            RandomAccessFile randomAccessFile=new RandomAccessFile(file,"r");
+            //定位到文件分片的位置
+            randomAccessFile.seek(i);
+            byte[]bytes=new byte[SLICE_SIZE];
+            //最后一个分片大小可能不足一个分片默认大小
+            int len = randomAccessFile.read(bytes);
+            String path="D:\\tempfile\\我是一个文件上传测试视频的第"+count+"."+fileType;
+            File slice=new File(path);
+            FileOutputStream fos=new FileOutputStream(slice);
+            fos.write(bytes,0,len);
+            randomAccessFile.close();
+            count++;
+        }
+        //删除临时文件
+        file.delete();
+    }
+
+    //将MultipartFile文件转为java中普通文件对象
+    private File multipartFileToFile(MultipartFile multipartFile) throws Exception {
+        String originalFilename = multipartFile.getOriginalFilename();
+        String[] fileName = originalFilename.split("\\.");
+        //生成一个临时文件
+        File file=File.createTempFile(fileName[0],"."+fileName[1]);
+        multipartFile.transferTo(file);
+        return file;
     }
 
     //删除
