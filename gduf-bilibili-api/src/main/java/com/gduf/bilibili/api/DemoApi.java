@@ -22,6 +22,12 @@ public class DemoApi {
        return demoService.query(id);
     }
 
+    /**
+     * 文件分片
+     * @param file
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/slices")
     public JsonResponse<String>slices(MultipartFile file) throws Exception {
         fastDFSUtil.convertFileToSlices(file);

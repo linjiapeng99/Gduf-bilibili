@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.FileDao">
+    <!--在数据库中新增上传成功的文件标识-->
+    <insert id="addFile">
+        insert into
+            t_file(url, type, md5, createTime)
+        values
+            (#{url},#{type},#{md5},#{createTime})
+    </insert>
+    <!--根据文件md5唯一标识获取文件-->
+    <select id="getFileByMd5" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.File">
+        select *
+        from t_file
+        where md5=#{fileMd5}
+    </select>
+</mapper>
