@@ -150,7 +150,7 @@ public class FastDFSUtil {
             byte[]bytes=new byte[SLICE_SIZE];
             //最后一个分片大小可能不足一个分片默认大小
             int len = randomAccessFile.read(bytes);
-            String path="D:\\tempfile\\我是一个文件上传测试视频的第"+count+"."+fileType;
+            String path="D:\\tempfile\\"+count+"."+fileType;
             File slice=new File(path);
             FileOutputStream fos=new FileOutputStream(slice);
             fos.write(bytes,0,len);
