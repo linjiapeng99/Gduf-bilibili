@@ -17,4 +17,6 @@ public interface VideoDao {
     Integer pageCountVideo(Map<String, Object> params);
 
     List<Video> pageListVideos(Map<String,Object> params);
+
+    List<VideoTag> getVideoTagsByVideoId(Long videoId);
 }

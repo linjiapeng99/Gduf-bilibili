@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.TagDao">
+    <!--新增标签-->
+    <insert id="addTags" parameterType="com.gduf.bilibili.domain.Tag">
+        insert into
+            t_tag(name, createTime)
+        values
+            (#{name},#{createTime})
+    </insert>
+    <!--查询标签-->
+    <select id="getTags" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.Tag">
+        select
+            *
+        from
+            t_tag
+        where
+            1=1
+        <if test="name!=null and name!=''">
+            and name=#{name}
+        </if>
+    </select>
+    <!--删除标签-->
+    <delete id="deleteTags" parameterType="com.gduf.bilibili.domain.Tag">
+        delete
+        from t_tag
+        where id = #{id}
+          and name = #{name}
+    </delete>
+</mapper>

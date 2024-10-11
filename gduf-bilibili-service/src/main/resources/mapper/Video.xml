@@ -58,4 +58,10 @@
                 and area=#{area}
             </if>
     </select>
+    <!--根据视频id获取视频标签列表-->
+    <select id="getVideoTagsByVideoId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.VideoTag">
+        select *
+        from t_video_tag
+        where videoId = #{videoId}
+    </select>
 </mapper>

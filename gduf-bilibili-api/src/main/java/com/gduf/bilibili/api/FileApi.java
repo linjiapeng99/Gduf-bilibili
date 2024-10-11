@@ -29,7 +29,7 @@ public class FileApi {
     }
 
     /**
-     * 秒传
+     * 获取文件md5唯一标识的
      * @param file
      * @return
      * @throws Exception

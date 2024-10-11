@@ -60,11 +60,17 @@ public class VideoService {
         Integer total = videoDao.pageCountVideo(params);
         if (total > 0) {
             list = videoDao.pageListVideos(params);
+            List<VideoTag> tagList=new ArrayList<>();
+            for (Video video : list) {
+                Long videoId = video.getId();
+                tagList = videoDao.getVideoTagsByVideoId(videoId);
+                video.setVideoTagList(tagList);
+            }
         }
         return new PageResult<>(total, list);
     }
 
     public void viewVideoOnlineBySlices(HttpServletRequest request, HttpServletResponse response, String path) throws Exception {
-        fastDFSUtil.viewVideoOnlineBySlices(request,response,path);
+        fastDFSUtil.viewVideoOnlineBySlices(request, response, path);
     }
 }
