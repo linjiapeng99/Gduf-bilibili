@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.UserCoinDao">
+    <!--查询用户的硬币数量-->
+    <select id="getUserCoinAmount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select *
+        from t_user_coin
+        where userId=#{userId}
+    </select>
+    <!--更新用户硬币余额-->
+    <update id="updateUserCoinAmount">
+        update t_user_coin
+        set amount=#{amount} and updateTime=#{updateTime}
+        where userId=#{userId}
+    </update>
+</mapper>

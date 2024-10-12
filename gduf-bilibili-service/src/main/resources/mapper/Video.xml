@@ -64,4 +64,85 @@
         from t_video_tag
         where videoId = #{videoId}
     </select>
+    <!--根据id查询视频-->
+    <select id="getVideoById" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.Video">
+        select *
+        from t_video
+        where id = #{id}
+    </select>
+    <!--根据用户id和视频id获取点赞记录-->
+    <select id="getVideoLikeByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoLike">
+        select *
+        from t_video_like
+        where userId = #{userId}
+          and videoId = #{videoId}
+    </select>
+    <!--添加视频点赞记录-->
+    <insert id="addVideoLike" parameterType="com.gduf.bilibili.domain.VideoLike">
+        insert into t_video_like(userId, videoId, createTime)
+        values (#{userId}, #{videoId}, #{createTime})
+    </insert>
+    <!--取消视频点赞记录-->
+    <delete id="deleteVideoLike">
+        delete
+        from t_video_like
+        where userId = #{userId}
+          and videoId = #{videoId}
+    </delete>
+    <!--根据视频id获取视频点赞数量-->
+    <select id="getVideoLikesByVideoId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select
+            count(1)
+        from t_video_like
+        where videoId=#{videoId}
+    </select>
+    <!--删除视频收藏-->
+    <delete id="deleteVideoCollection" parameterType="java.lang.Long">
+        delete from t_video_collection
+        where userId=#{userId} and videoId=#{videoId}
+    </delete>
+    <!--添加视频收藏-->
+    <insert id="addVideoCollection" parameterType="com.gduf.bilibili.domain.VideoCollection">
+        insert into t_video_collection(videoId, userId, groupId, createTime)
+        values (#{videoId}, #{userId}, #{groupId}, #{createTime})
+    </insert>
+    <!--获取视频的收藏数量-->
+    <select id="getVideoCollectionsByVideoId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select
+            count(1)
+        from t_video_collection
+        where videoId=#{videoId}
+    </select>
+    <!--根据用户id和视频id获取视频收藏几里路-->
+    <select id="getVideoCollectionByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoLike">
+        select *
+        from t_video_collection
+        where userId = #{userId}
+          and videoId = #{videoId}
+    </select>
+    <!--根据用户id和视频id查询用户投币记录-->
+    <select id="getVideoCoinByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoCoin">
+        select *
+        from t_video_coin
+        where userId = #{videoId}
+          and videoId = #{videoId}
+    </select>
+    <!--新增投币-->
+    <insert id="addVideoCoins" parameterType="com.gduf.bilibili.domain.VideoCoin">
+        insert into t_video_coin(userId, videoId, amount, createTime)
+        values (#{userId},#{videoId},#{amount},#{createTime})
+    </insert>
+    <!--更新视频硬币数量-->
+    <update id="updateVideoCoins" parameterType="com.gduf.bilibili.domain.VideoCoin">
+        update t_video_coin
+        set amount=#{amount} and updateTime = #{updateTime}
+        where userId = #{userId}
+          and videoId = #{videoId}
+    </update>
+    <!--获取视频硬币数量-->
+    <select id="getVideoCoinAmount" resultType="java.lang.Long">
+        select sum(amount)
+        from t_video_coin
+        where videoId = #{videoId}
+    </select>
 </mapper>

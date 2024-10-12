@@ -28,9 +28,6 @@ public class UserFollowingService {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private FollowingGroupDao followingGroupDao;
-
     /**
      * 添加用户关注
      *
