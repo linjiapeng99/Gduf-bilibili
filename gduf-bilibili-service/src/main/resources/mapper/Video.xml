@@ -3,18 +3,16 @@
 <mapper namespace="com.gduf.bilibili.dao.VideoDao">
     <!--新增视频-->
     <insert id="addVideos" parameterType="com.gduf.bilibili.domain.Video" useGeneratedKeys="true" keyProperty="id">
-        insert into
-            t_video(userId,
-                    url,
-                    thumbnail,
-                    title,
-                    type,
-                    duration,
-                    area,
-                    description,
-                    createTime)
-        values (
-                #{userId},
+        insert into t_video(userId,
+                            url,
+                            thumbnail,
+                            title,
+                            type,
+                            duration,
+                            area,
+                            description,
+                            createTime)
+        values (#{userId},
                 #{url},
                 #{thumbnail},
                 #{title},
@@ -22,41 +20,40 @@
                 #{duration},
                 #{area},
                 #{description},
-                #{createTime}
-        )
+                #{createTime})
     </insert>
     <!--新增视频标签-->
     <insert id="batchAddVideoTags" parameterType="java.util.List">
         insert into
-            t_video_tag
+        t_video_tag
         (videoId, tagId, createTime)
-        values 
-            <foreach collection="tagList" item="videoTag" separator=",">
-                (#{videoTag.videoId},#{tagId},#{createTime})
-            </foreach>
+        values
+        <foreach collection="tagList" item="videoTag" separator=",">
+            (#{videoTag.videoId},#{tagId},#{createTime})
+        </foreach>
     </insert>
     <!--查询视频条数-->
     <select id="pageCountVideo" parameterType="java.util.Map" resultType="java.lang.Integer">
         select
-            count(1)
+        count(1)
         from
-            t_video
+        t_video
         where
-            1=1
-            <if test="area!=null and area!=''">
-                and area=#{area}
-            </if>
+        1=1
+        <if test="area!=null and area!=''">
+            and area=#{area}
+        </if>
     </select>
     <!--查询视频记录-->
     <select id="pageListVideos" parameterType="java.util.Map" resultType="com.gduf.bilibili.domain.Video">
         select *
-            from
-            t_video
+        from
+        t_video
         where
-            1=1
-            <if test="area!=null and area!=''">
-                and area=#{area}
-            </if>
+        1=1
+        <if test="area!=null and area!=''">
+            and area=#{area}
+        </if>
     </select>
     <!--根据视频id获取视频标签列表-->
     <select id="getVideoTagsByVideoId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.VideoTag">
@@ -91,15 +88,16 @@
     </delete>
     <!--根据视频id获取视频点赞数量-->
     <select id="getVideoLikesByVideoId" parameterType="java.lang.Long" resultType="java.lang.Long">
-        select
-            count(1)
+        select count(1)
         from t_video_like
-        where videoId=#{videoId}
+        where videoId = #{videoId}
     </select>
     <!--删除视频收藏-->
     <delete id="deleteVideoCollection" parameterType="java.lang.Long">
-        delete from t_video_collection
-        where userId=#{userId} and videoId=#{videoId}
+        delete
+        from t_video_collection
+        where userId = #{userId}
+          and videoId = #{videoId}
     </delete>
     <!--添加视频收藏-->
     <insert id="addVideoCollection" parameterType="com.gduf.bilibili.domain.VideoCollection">
@@ -108,10 +106,9 @@
     </insert>
     <!--获取视频的收藏数量-->
     <select id="getVideoCollectionsByVideoId" parameterType="java.lang.Long" resultType="java.lang.Long">
-        select
-            count(1)
+        select count(1)
         from t_video_collection
-        where videoId=#{videoId}
+        where videoId = #{videoId}
     </select>
     <!--根据用户id和视频id获取视频收藏几里路-->
     <select id="getVideoCollectionByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoLike">
@@ -130,7 +127,7 @@
     <!--新增投币-->
     <insert id="addVideoCoins" parameterType="com.gduf.bilibili.domain.VideoCoin">
         insert into t_video_coin(userId, videoId, amount, createTime)
-        values (#{userId},#{videoId},#{amount},#{createTime})
+        values (#{userId}, #{videoId}, #{amount}, #{createTime})
     </insert>
     <!--更新视频硬币数量-->
     <update id="updateVideoCoins" parameterType="com.gduf.bilibili.domain.VideoCoin">
@@ -144,5 +141,34 @@
         select sum(amount)
         from t_video_coin
         where videoId = #{videoId}
+    </select>
+    <!--新增评论-->
+    <insert id="addVideoComments" parameterType="com.gduf.bilibili.domain.VideoComment">
+        insert into t_video_comment(videoId, userId, comment, replyUserId, rootId, createTime)
+        values (#{videoId}, #{userId}, #{comment}, #{replyUserId}, #{rootId}, #{createTime})
+    </insert>
+    <!--查询视频的总条数-->
+    <select id="pageCountVideoComments" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1)
+        from t_video_comment
+        where rootId is null
+          and videoId = #{videoId}
+    </select>
+    <!--分页查询视频评论-->
+    <select id="pageListVideoComments" parameterType="java.util.Map" resultType="com.gduf.bilibili.domain.VideoComment">
+        select *
+        from t_video_comment
+        where rootId is null
+          and videoId = #{videoId}
+        order by id desc
+        limit #{start},#{limit}
+    </select>
+    <select id="batchGetVideoCommentsByRootIds" parameterType="java.util.List" resultType="com.gduf.bilibili.domain.VideoComment">
+        select * from t_video_comment
+        where rootId in
+        <foreach collection="parentIds" item="rootId" index="index" separator="," open="(" close=")">
+            #{rootId}
+        </foreach>
+        order by id
     </select>
 </mapper>

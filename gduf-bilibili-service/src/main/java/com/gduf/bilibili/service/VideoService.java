@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
@@ -25,7 +26,9 @@ public class VideoService {
     private UserCoinService userCoinService;
     @Autowired
     private UserCoinDao userCoinDao;
-
+    @Autowired
+    private UserService userService;
+    @Autowired
     /**
      * 添加视频
      *
@@ -215,17 +218,88 @@ public class VideoService {
         userCoinService.updateUserCoinAmount(userId, (userCoinAmount - amount));
     }
 
-    public Map<String, Object> getVideoCoins(Long userId,Long videoId) {
+    public Map<String, Object> getVideoCoins(Long userId, Long videoId) {
         Video video = videoDao.getVideoById(videoId);
         if (video == null) {
             throw new ConditionException("非法视频");
         }
         Long count = videoDao.getVideoCoinAmount(video);
         VideoCoin videoCoin = videoDao.getVideoCoinByVideoIdAndUserId(userId, videoId);
-        boolean like=videoCoin!=null;
+        boolean like = videoCoin != null;
+        Map<String, Object> result = new HashMap<>();
+        result.put("like", like);
+        result.put("count", count);
+        return result;
+    }
+
+    public void addVideoComments(VideoComment videoComment, Long userId) {
+        Long videoId = videoComment.getVideoId();
+        if (videoId == null) {
+            throw new ConditionException("参数异常");
+        }
+        Video video = videoDao.getVideoById(videoId);
+        if (video == null) {
+            throw new ConditionException("非法视频");
+        }
+        videoComment.setUserId(userId);
+        videoComment.setCreateTime(new Date());
+        videoDao.addVideoComments(videoComment);
+    }
+
+    public PageResult<VideoComment> pageListVideoComments(Integer pageNo, Integer pageSize, Long videoId) {
+        //参数判断
+        Video video = videoDao.getVideoById(videoId);
+        if (video == null) {
+            throw new ConditionException("非法视频");
+        }
+        //参数设置
+        Map<String, Object> params = new HashMap<>();
+        params.put("start", (pageNo - 1) * pageSize);
+        params.put("limit", pageSize);
+        params.put("videoId", videoId);
+        //查询一级评论总数量
+        Integer total = videoDao.pageCountVideoComments(params);
+        List<VideoComment> list = new ArrayList<>();
+        if (total > 0) {
+            //这里查的是一级评论
+            list = videoDao.pageListVideoComments(params);
+            //批量查询二级评论
+            List<Long> parentIds = list.stream().map(VideoComment::getId).collect(Collectors.toList());
+            List<VideoComment> childCommentList = videoDao.batchGetVideoCommentsByRootIds(parentIds);
+            //一级评论用户id
+            Set<Long> userIdList = list.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
+            //二级评论用户id
+            Set<Long> childIdSet = childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
+            //二级评论回复用户id
+            //Set<Long> replyUserIdList = childCommentList.stream().map(VideoComment::getReplyUserId).collect(Collectors.toSet());
+            userIdList.addAll(childIdSet);
+            List<UserInfo>userInfoList=userService.batchGetUserInfoByUserIds(userIdList);
+            Map<Long, UserInfo> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfo::getUserId, userInfo -> userInfo));
+            list.forEach(comment->{
+                Long id=comment.getId();
+                List<VideoComment>childList=new ArrayList<>();
+                childCommentList.forEach(child->{
+                    if(id.equals(child.getRootId())){
+                        child.setUserInfo(userInfoMap.get(child.getUserId()));
+                        child.setReplyUserInfo(userInfoMap.get(child.getReplyUserId()));
+                        childList.add(child);
+                    }
+                });
+                comment.setChildList(childList);
+                comment.setUserInfo(userInfoMap.get(comment.getUserId()));
+            });
+        }
+        return new PageResult<>(total,list);
+    }
+
+    public Map<String, Object> getVideoDetail(Long videoId) {
+        Video video=videoDao.getVideoById(videoId);
+        Long userId = video.getUserId();
+        User user = userService.getUserInfo(userId);
+        UserInfo userInfo = user.getUserInfo();
         Map<String,Object>result=new HashMap<>();
-        result.put("like",like);
-        result.put("count",count);
+        result.put("video",video);
+        result.put("userInfo",userInfo);
         return result;
     }
 }

@@ -116,4 +116,12 @@
                 t_refresh_token
         where refreshToken=#{refreshToken}
     </select>
+    <!--批量查询用户信息-->
+    <select id="batchGetUserInfoByUserIds" resultType="com.gduf.bilibili.domain.UserInfo">
+        select * from t_user_info
+        where userId in
+        <foreach collection="userIdList" item="userId" separator="," index="index" open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
 </mapper>
