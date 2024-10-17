@@ -77,6 +77,11 @@ public class VideoApi {
         return JsonResponse.success();
     }
 
+    /**
+     * 删除视频点赞
+     * @param videoId
+     * @return
+     */
     @DeleteMapping("/video-likes")
     public JsonResponse<String> deleteVideoLike(@RequestParam Long videoId) {
         Long userId = userSupport.getCurrentUserId();

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gduf.bilibili.dao.DanmuDao">
+    <!--新增弹幕-->
+    <insert id="addDanmu" parameterType="com.gduf.bilibili.domain.Danmu">
+        insert into t_danmu(userId, videoId, content, danmuTime, createTime)
+        values (#{userId},#{videoId},#{content},#{danmuTime},#{createTime})
+    </insert>
+</mapper>

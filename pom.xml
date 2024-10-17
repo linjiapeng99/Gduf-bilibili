@@ -105,5 +105,11 @@
             <artifactId>fastdfs-client</artifactId>
             <version>1.27.2</version>
         </dependency>
+        <!--WebSocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>2.5.1</version>
+        </dependency>
     </dependencies>
 </project>

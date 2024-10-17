@@ -28,7 +28,6 @@ public class VideoService {
     private UserCoinDao userCoinDao;
     @Autowired
     private UserService userService;
-    @Autowired
     /**
      * 添加视频
      *
