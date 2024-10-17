@@ -2,10 +2,15 @@ package com.gduf.bilibili.service.websocket;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gduf.bilibili.domain.Danmu;
+import com.gduf.bilibili.domain.constant.UserContant;
+import com.gduf.bilibili.domain.constant.UserMomentsConstant;
 import com.gduf.bilibili.service.DanmuService;
 import com.gduf.bilibili.service.config.WebSocketConfig;
+import com.gduf.bilibili.service.util.RocketMQUtil;
 import com.gduf.bilibili.service.util.TokenUtil;
 import com.mysql.cj.util.StringUtils;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.common.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +36,7 @@ public class WebSocketService {
     //在线人数，即连接服务端的客户端的人数
     private static final AtomicInteger ONLINE_COUNT=new AtomicInteger(0);
     //创建一个map集合，用来保存已连接成功的客户端
-    private static final ConcurrentHashMap<String,WebSocketService>WEBSOCKET_MAP=new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String,WebSocketService>WEBSOCKET_MAP=new ConcurrentHashMap<>();
     //每当与客户端成功连接成功，那么就创建一个会话对象
     private Session session;
     //会话对象的唯一id
@@ -85,9 +91,17 @@ public class WebSocketService {
                 //群发消息
                 for(Map.Entry<String, WebSocketService> entry:WEBSOCKET_MAP.entrySet()){
                     WebSocketService webSocketService = entry.getValue();
-                    if(webSocketService.session.isOpen()){
+                    DefaultMQProducer producer =(DefaultMQProducer) APPLICATION_CONTEXT.getBean("danmusProducer");
+                    JSONObject jsonObject=new JSONObject();
+                    jsonObject.put("sessionId",webSocketService.getSessionId());
+                    jsonObject.put("message",message);
+                    Message msg=new Message(UserMomentsConstant.TOPIC_DANMUS,jsonObject.toJSONString().getBytes(StandardCharsets.UTF_8));
+                    //异步发送
+                    RocketMQUtil.ayncSendMessage(producer,msg);
+
+                    /*if(webSocketService.session.isOpen()){
                         webSocketService.sendMessage(message);
-                    }
+                    }*/
                 }
                 if(this.userId!=null){
                     //保存弹幕到数据库中
@@ -110,5 +124,21 @@ public class WebSocketService {
     }
     public void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

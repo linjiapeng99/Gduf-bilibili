@@ -7,6 +7,7 @@ import com.gduf.bilibili.domain.Danmu;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +21,10 @@ public class DanmuService {
     private RedisTemplate<String, String>redisTemplate;
 
     public void addDanmu(Danmu danmu){
+        danmuDao.addDanmu(danmu);
+    }
+    @Async
+    public void AsycAddDanmu(Danmu danmu){
         danmuDao.addDanmu(danmu);
     }
 
