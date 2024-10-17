@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -115,6 +116,19 @@ public class WebSocketService {
             }catch (Exception e){
                 logger.error("弹幕接收异常");
                 e.printStackTrace();
+            }
+        }
+    }
+    //向前端推送当前观看在线人数  5秒
+    @Scheduled(fixedRate =5000)
+    public void noticeOnlineCount() throws IOException {
+        for (Map.Entry<String, WebSocketService> entry : WebSocketService.WEBSOCKET_MAP.entrySet()) {
+            WebSocketService webSocketService = entry.getValue();
+            if(webSocketService.getSession().isOpen()){
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("onlineCount",ONLINE_COUNT.get());
+                jsonObject.put("msg","当前在线人数为："+ONLINE_COUNT.get());
+                webSocketService.sendMessage(jsonObject.toJSONString());
             }
         }
     }
