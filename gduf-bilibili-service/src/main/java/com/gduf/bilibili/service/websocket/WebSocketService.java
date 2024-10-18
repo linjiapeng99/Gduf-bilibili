@@ -55,8 +55,6 @@ public class WebSocketService {
         try{
             Long userId = TokenUtil.verifyToken(token);
         }catch (Exception ignored){}
-        RedisTemplate<String,String> redisTemplate =(RedisTemplate<String, String>) WebSocketService.APPLICATION_CONTEXT.getBean("redisTemplate");
-        redisTemplate.opsForValue().get("ssss");
         this.sessionId=session.getId();
         this.session=session;
         if(WEBSOCKET_MAP.containsKey(sessionId)){//当前客户端是老的客户端

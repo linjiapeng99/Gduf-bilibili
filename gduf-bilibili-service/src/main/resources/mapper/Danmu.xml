@@ -6,4 +6,15 @@
         insert into t_danmu(userId, videoId, content, danmuTime, createTime)
         values (#{userId},#{videoId},#{content},#{danmuTime},#{createTime})
     </insert>
+    <!--查询弹幕-->
+    <select id="getDanmus" parameterType="java.util.Map" resultType="com.gduf.bilibili.domain.Danmu">
+        select * from t_danmu
+        where videoId=#{videoId}
+        <if test="startTime!=null and startTime!=''">
+            and createTime <![CDATA[>=]]]>#{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and createTime <![CDATA[<=]]]>#{endTime}
+        </if>
+    </select>
 </mapper>

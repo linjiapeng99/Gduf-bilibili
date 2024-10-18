@@ -10,8 +10,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class DanmuService {
@@ -20,6 +21,7 @@ public class DanmuService {
     @Autowired
     private RedisTemplate<String, String>redisTemplate;
 
+    private static final String DANMU_KEY="danmu-video-";
     public void addDanmu(Danmu danmu){
         danmuDao.addDanmu(danmu);
     }
@@ -30,7 +32,7 @@ public class DanmuService {
 
 
     public void addDanmusToRedis(Danmu danmu) {
-        String key="danmu-video-"+danmu.getVideoId();
+        String key=DANMU_KEY+danmu.getVideoId();
         String value=redisTemplate.opsForValue().get(key);
         List<Danmu>list=new ArrayList<>();
         if(!StringUtils.isNullOrEmpty(value)){
@@ -38,5 +40,38 @@ public class DanmuService {
         }
         list.add(danmu);
         redisTemplate.opsForValue().set(key,JSONObject.toJSONString(danmu));
+    }
+
+    public List<Danmu> getDanmus(Long videoId, String startTime, String endTime) throws Exception {
+        String key=DANMU_KEY+videoId;
+        String value = redisTemplate.opsForValue().get(key);
+        List<Danmu>list;
+        if(!StringUtils.isNullOrEmpty(value)){//缓存中存在
+            //拿出redis这个视频的所有弹幕
+            list=JSONArray.parseArray(value,Danmu.class);
+            if(!StringUtils.isNullOrEmpty(startTime)&& !StringUtils.isNullOrEmpty(endTime)){
+                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date startDate=sdf.parse(startTime);
+                Date endDate=sdf.parse(endTime);
+                //根据时间查询的弹幕
+                List<Danmu>childList=new ArrayList<>();
+                for (Danmu danmu : list) {
+                    Date createTime=danmu.getCreateTime();
+                    if(createTime.after(startDate)&& createTime.before(endDate)){
+                        childList.add(danmu);
+                    }
+                }
+                list=childList;
+            }
+        }else {//缓存中不存在则走数据库
+            Map<String,Object> map=new HashMap<>();
+            map.put("videoId",videoId);
+            map.put("startTime",startTime);
+            map.put("endTime",endTime);
+            list=danmuDao.getDanmus(map);
+            //保存弹幕到redis中
+            redisTemplate.opsForValue().set(key,JSONObject.toJSONString(list));
+        }
+        return list;
     }
 }
