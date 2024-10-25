@@ -5,9 +5,11 @@ import com.gduf.bilibili.dao.VideoDao;
 import com.gduf.bilibili.domain.*;
 import com.gduf.bilibili.exception.ConditionException;
 import com.gduf.bilibili.service.util.FastDFSUtil;
+import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +42,9 @@ public class VideoService {
         videoDao.addVideos(video);
         Long videoId = video.getId();
         List<VideoTag> tagList = video.getVideoTagList();
+        if(CollectionUtils.isEmpty(tagList)){
+            return;
+        }
         tagList.forEach(item -> {
             item.setVideoId(videoId);
             item.setCreateTime(now);

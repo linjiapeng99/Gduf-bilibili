@@ -3,6 +3,7 @@ package com.gduf.bilibili.api;
 import com.gduf.bilibili.api.support.UserSupport;
 import com.gduf.bilibili.dao.VideoDao;
 import com.gduf.bilibili.domain.*;
+import com.gduf.bilibili.service.ElasticSearchService;
 import com.gduf.bilibili.service.VideoService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ public class VideoApi {
     private UserSupport userSupport;
     @Autowired
     private VideoService videoService;
-
+    @Autowired
+    private ElasticSearchService elasticSearchService;
 
     /**
      * 添加视频
@@ -32,6 +34,8 @@ public class VideoApi {
         Long userId = userSupport.getCurrentUserId();
         video.setUserId(userId);
         videoService.addVideos(video);
+        //将视频添加到es中
+        elasticSearchService.addVideo(video);
         return JsonResponse.success();
     }
 
