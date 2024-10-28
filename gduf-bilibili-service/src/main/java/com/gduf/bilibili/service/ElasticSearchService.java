@@ -20,7 +20,6 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.naming.directory.SearchResult;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +35,7 @@ public class ElasticSearchService {
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+
     public void addUserInfo(UserInfo userInfo){
         userInfoRepository.save(userInfo);
     }

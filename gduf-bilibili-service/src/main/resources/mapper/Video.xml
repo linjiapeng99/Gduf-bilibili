@@ -163,12 +163,70 @@
         order by id desc
         limit #{start},#{limit}
     </select>
-    <select id="batchGetVideoCommentsByRootIds" parameterType="java.util.List" resultType="com.gduf.bilibili.domain.VideoComment">
+    <!--查询视频评论-->
+    <select id="batchGetVideoCommentsByRootIds" parameterType="java.util.List"
+            resultType="com.gduf.bilibili.domain.VideoComment">
         select * from t_video_comment
         where rootId in
         <foreach collection="parentIds" item="rootId" index="index" separator="," open="(" close=")">
             #{rootId}
         </foreach>
         order by id
+    </select>
+    <!--查询视频观看记录-->
+    <select id="getVideoView" parameterType="java.util.Map" resultType="com.gduf.bilibili.domain.VideoView">
+        select
+        *
+        from
+        t_video_view
+        where
+        videoId=#{videoId}
+        <if test="userId==null and clientId!=null">
+            and clientId=#{clientId}
+        </if>
+        <if test="userId!=null">
+            userId=#{userId}
+        </if>
+        <if test="ip==null and ip!=''">
+            and ip=#{ip}
+        </if>
+        <if test="today!=null and today!=''">
+            and DATE_FORMAT(createTime,'%Y-%m-%d')=#{today}
+        </if>
+    </select>
+    <!--新增观看记录-->
+    <insert id="addVideoView">
+        insert into t_video_view(videoId, userId, clientId, ip, createTime)
+        values (#{videoId}, #{userId}, #{clientId}, #{ip}, #{createTime})
+    </insert>
+    <!--查询视频观看数量-->
+    <select id="getVideoCounts" resultType="java.lang.Integer">
+        select count(1)
+        from t_video_view
+        where videoId = #{videoId}
+    </select>
+    <!--内容推荐查询-->
+    <select id="getAllUserPreference" resultType="com.gduf.bilibili.domain.UserPreference">
+        select userId,
+               videoId,
+               sum(case operationType
+                       when '0' then 6
+                       when '1' then 2
+                       when '2' then 2
+                       else 0 end
+               ) as 'value'
+        from t_video_operation
+        group by userId, videoId
+    </select>
+    <!--根据ids批量查询视频-->
+    <select id="batchVideosByIds" resultType="com.gduf.bilibili.domain.Video">
+        select 
+            *
+        from t_video
+        where
+            id in
+        <foreach collection="idList" item="id" index="index" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>
