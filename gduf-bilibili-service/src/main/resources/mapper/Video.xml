@@ -220,13 +220,21 @@
     </select>
     <!--根据ids批量查询视频-->
     <select id="batchVideosByIds" resultType="com.gduf.bilibili.domain.Video">
-        select 
-            *
+        select
+        *
         from t_video
         where
-            id in
+        id in
         <foreach collection="idList" item="id" index="index" open="(" separator="," close=")">
             #{id}
         </foreach>
     </select>
+    <!--新增剪影文件-->
+    <insert id="batchAddBinaryPictures">
+        insert into t_video_binary_picture(videoId, frameNo, url, videoTimestamp, createTime)
+        values
+        <foreach collection="pictures" item="picture" separator=",">
+            (#{picture.videoId},#{picture.frameNo},#{url},#{picture.videoTimeStamp},#{picture.createTime})
+        </foreach>
+    </insert>
 </mapper>

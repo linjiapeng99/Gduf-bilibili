@@ -273,6 +273,7 @@ public class VideoApi {
 
     /**
      * 查询视频观看记录
+     *
      * @param videoId
      * @return
      */
@@ -284,16 +285,28 @@ public class VideoApi {
 
     /**
      * 视频内容推荐
+     *
      * @return
      */
     @GetMapping("/recommendations")
-    public JsonResponse<List<Video>>recommend() throws TasteException {
-        Long userId=userSupport.getCurrentUserId();
-        List<Video>list=videoService.recommend(userId);
+    public JsonResponse<List<Video>> recommend() throws TasteException {
+        Long userId = userSupport.getCurrentUserId();
+        List<Video> list = videoService.recommend(userId);
         return JsonResponse.success(list);
     }
 
-
+    /**
+     * 弹幕遮罩
+     * @param videoId
+     * @param fileMd5
+     * @return 获取视频剪影文件
+     * @throws Exception
+     */
+    @GetMapping("/video-frames")
+    public JsonResponse<List<VideoBinaryPicture>> captureVideoFrame(@RequestParam Long videoId, @RequestParam String fileMd5) throws Exception {
+        List<VideoBinaryPicture> list = videoService.convertVideoToImage(videoId, fileMd5);
+        return JsonResponse.success(list);
+    }
 }
 
 

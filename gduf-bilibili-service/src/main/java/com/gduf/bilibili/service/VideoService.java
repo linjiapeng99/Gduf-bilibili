@@ -5,6 +5,7 @@ import com.gduf.bilibili.dao.VideoDao;
 import com.gduf.bilibili.domain.*;
 import com.gduf.bilibili.exception.ConditionException;
 import com.gduf.bilibili.service.util.FastDFSUtil;
+import com.gduf.bilibili.service.util.ImageUtil;
 import com.gduf.bilibili.service.util.IpUtil;
 import eu.bitwalker.useragentutils.UserAgent;
 
@@ -22,13 +23,24 @@ import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
+import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,10 +56,12 @@ public class VideoService {
     @Autowired
     private UserCoinService userCoinService;
     @Autowired
-    private UserCoinDao userCoinDao;
-    @Autowired
     private UserService userService;
-
+    @Autowired
+    private FileService fileService;
+    @Autowired
+    private ImageUtil imageUtil;
+    private final static int FRAME_NO=256;
     /**
      * 添加视频
      *
@@ -361,36 +375,94 @@ public class VideoService {
     public List<Video> recommend(Long userId) throws TasteException {
         List<UserPreference> list = videoDao.getAllUserPreference();
         //创建数据模型
-        DataModel dataModel=this.createDataModel(list);
+        DataModel dataModel = this.createDataModel(list);
         //获取用户相似程度
-        UserSimilarity similarity=new UncenteredCosineSimilarity(dataModel);
-        System.out.println(similarity.userSimilarity(17,19));
+        UserSimilarity similarity = new UncenteredCosineSimilarity(dataModel);
+        System.out.println(similarity.userSimilarity(17, 19));
         //获取用户邻居
-        UserNeighborhood userNeighborhood=new NearestNUserNeighborhood(2,similarity,dataModel);
+        UserNeighborhood userNeighborhood = new NearestNUserNeighborhood(2, similarity, dataModel);
         long[] ar = userNeighborhood.getUserNeighborhood(userId);
         //构建推荐器
-        Recommender recommender=new GenericUserBasedRecommender(dataModel,userNeighborhood,similarity);
-        List<RecommendedItem> recommendedItems = recommender.recommend(userId, 3,true);
+        Recommender recommender = new GenericUserBasedRecommender(dataModel, userNeighborhood, similarity);
+        List<RecommendedItem> recommendedItems = recommender.recommend(userId, 3, true);
         List<Long> itemIds = recommendedItems.stream().map(RecommendedItem::getItemID).collect(Collectors.toList());
         return videoDao.batchVideosByIds(itemIds);
     }
-    private DataModel createDataModel(List<UserPreference>userPreferenceList){
-        FastByIDMap<PreferenceArray>fastByIDMap=new FastByIDMap<>();
+
+    private DataModel createDataModel(List<UserPreference> userPreferenceList) {
+        FastByIDMap<PreferenceArray> fastByIDMap = new FastByIDMap<>();
         //每个用户和他的喜好的map
         Map<Long, List<UserPreference>> map = userPreferenceList.stream().collect(Collectors.groupingBy(UserPreference::getUserId));
         //将所有的用户喜好放在一个集合中
         Collection<List<UserPreference>> list = map.values();
         for (List<UserPreference> userPreferences : list) {//每一个用户的喜好
             //将用户的喜好转为java中的数据模型
-            GenericPreference []array=new GenericPreference[userPreferences.size()];
+            GenericPreference[] array = new GenericPreference[userPreferences.size()];
             for (int i = 0; i < userPreferences.size(); i++) {
                 UserPreference userPreference = userPreferences.get(i);
-                GenericPreference item=new GenericPreference(userPreference.getUserId(),userPreference.getVideoId(),userPreference.getValue());
-                array[i]=item;
+                GenericPreference item = new GenericPreference(userPreference.getUserId(), userPreference.getVideoId(), userPreference.getValue());
+                array[i] = item;
             }
-            fastByIDMap.put(array[0].getUserID(),new GenericUserPreferenceArray(Arrays.asList(array)));
+            fastByIDMap.put(array[0].getUserID(), new GenericUserPreferenceArray(Arrays.asList(array)));
         }
         return new GenericDataModel(fastByIDMap);
+    }
+
+    public List<VideoBinaryPicture> convertVideoToImage(Long videoId, String fileMd5) throws Exception {
+        //根据文件唯一 标识获取数据库文件
+        File file = fileService.getFileByMd5(fileMd5);
+        String filePath = "D:\\p" + videoId + file.getType();
+        //到文件服务器上下载该视频，并放到指定目录，之所以要下载是因为我们现在用的服务器是单机版的，可以在本地操作，但是现实中可能服务器是分布式的，所以一个文件可能在不同的服务器上
+        fastDFSUtil.downLoadFile(file.getUrl(), filePath);
+        //生成用来处理视频截取桢的关键类
+        FFmpegFrameGrabber fFmpegFrameGrabber = FFmpegFrameGrabber.createDefault(filePath);
+        fFmpegFrameGrabber.start();
+        //获取总桢数目
+        int ffLentgh = fFmpegFrameGrabber.getLengthInFrames();
+        //每一帧
+        Frame frame;
+        //转换类，将桢转为我们想要的文件类
+        Java2DFrameConverter converter = new Java2DFrameConverter();
+        int count = 1;
+        //存放每一帧的集合
+        List<VideoBinaryPicture> pictures = new ArrayList<>();
+        for (int i = 1; i <= ffLentgh; i++) {
+            //获取该桢在视频的时间戳
+            long timestamp = fFmpegFrameGrabber.getTimestamp();
+            //截取桢
+            frame = fFmpegFrameGrabber.grabImage();
+            if(count==i){
+                if(frame==null){
+                    throw  new ConditionException("无效桢");
+                }
+                //将桢转为BufferedImage（图片的数据形式）
+                BufferedImage bufferedImage=converter.getBufferedImage(frame);
+                ByteArrayOutputStream os=new ByteArrayOutputStream();
+                //将图片转为png形式
+                ImageIO.write(bufferedImage,"png",os);
+                InputStream inputStream=new ByteArrayInputStream(os.toByteArray());
+                //调用百度 api输出黑白剪影文件
+                java.io.File outputFile=java.io.File.createTempFile("convert-"+videoId+"-",".png");
+                BufferedImage binaryImg = imageUtil.getBodyOutline(bufferedImage, inputStream);
+                ImageIO.write(binaryImg,"png",outputFile);
+                //上传视频剪影文件
+                String imgUrl=fastDFSUtil.uploadCommonFile((MultipartFile) outputFile);
+                VideoBinaryPicture videoBinaryPicture=new VideoBinaryPicture();
+                videoBinaryPicture.setFrameNo(i);
+                videoBinaryPicture.setUrl(imgUrl);
+                videoBinaryPicture.setVideoId(videoId);
+                videoBinaryPicture.setVideoTimeStamp(timestamp);
+                pictures.add(videoBinaryPicture);
+                count+=FRAME_NO;
+                outputFile.delete();
+            }
+
+        }
+        java.io.File tamFile=new java.io.File(filePath);
+        tamFile.delete();
+        //批量添加视频剪影文件
+        videoDao.batchAddBinaryPictures(pictures);
+        return pictures;
     }
 }
 

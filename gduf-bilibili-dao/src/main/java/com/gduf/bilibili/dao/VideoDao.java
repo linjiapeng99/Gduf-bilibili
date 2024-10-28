@@ -65,4 +65,5 @@ public interface VideoDao {
 
     List<Video> batchVideosByIds(List<Long> idList);
 
+    Integer batchAddBinaryPictures(List<VideoBinaryPicture> pictures);
 }

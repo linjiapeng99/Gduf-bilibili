@@ -4,6 +4,7 @@ import com.gduf.bilibili.exception.ConditionException;
 import com.github.tobato.fastdfs.domain.fdfs.FileInfo;
 import com.github.tobato.fastdfs.domain.fdfs.MetaData;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
+import com.github.tobato.fastdfs.domain.proto.storage.DownloadCallback;
 import com.github.tobato.fastdfs.service.AppendFileStorageClient;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.mysql.cj.util.StringUtils;
@@ -16,9 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.*;
 
 @Component
@@ -227,5 +226,28 @@ public class FastDFSUtil {
         response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
         //调用核心工具类下载文件，这里参数response也是给前端的响应，所以下载完视频也是直接写到前端了，故不用获取返回的流
         HttpUtil.get(url,headers,response);
+    }
+
+    /**
+     * 下载文件
+     * @param url
+     * @param localPath
+     */
+    public void downLoadFile(String url, String localPath) {
+        fastFileStorageClient.downloadFile(DEFAULT_GROUP, url, new DownloadCallback<Object>() {
+            @Override
+            public Object recv(InputStream ins) throws IOException {
+                File file=new File(localPath);
+                OutputStream os=new FileOutputStream(file);
+                int len=0;
+                byte[]buffer=new byte[1024];
+                while ((len=ins.read(buffer))!=-1){
+                    os.write(buffer,0,len);
+                }
+                os.close();
+                ins.close();
+                return "success";
+            }
+        });
     }
 }

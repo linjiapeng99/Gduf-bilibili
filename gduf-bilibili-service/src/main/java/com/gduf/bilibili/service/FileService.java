@@ -59,4 +59,8 @@ public class FileService {
         fis.close();
         return DigestUtils.md5Hex(baos.toByteArray());
     }
+
+    public File getFileByMd5(String fileMd5){
+        return fileDao.getFileByMd5(fileMd5);
+    }
 }
