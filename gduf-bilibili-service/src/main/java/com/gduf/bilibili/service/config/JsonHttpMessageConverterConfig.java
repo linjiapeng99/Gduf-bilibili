@@ -8,8 +8,10 @@ import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -38,6 +40,8 @@ public class JsonHttpMessageConverterConfig {
                 SerializerFeature.DisableCircularReferenceDetect//禁止循环引用
         );
         fastConverter.setFastJsonConfig(fastJsonConfig);
+        //如果使用feign进行跨服务接口调用的话，那么就要设置将map和json数据兼容
+        fastConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
         return new HttpMessageConverters(fastConverter);
     }
 }
