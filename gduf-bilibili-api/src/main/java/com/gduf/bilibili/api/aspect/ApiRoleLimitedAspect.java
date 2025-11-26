@@ -32,7 +32,9 @@ public class ApiRoleLimitedAspect {
     @Before("check()&& @annotation(apiLimitedRole)")
     public void doBefore(JoinPoint joinPoint, ApiLimitedRole apiLimitedRole){
         Long userId = userSupport.getCurrentUserId();
+        //获取用户具备的权限
         List<UserRole> userRoleList = userRoleService.getUserRoleByUserId(userId);
+        //获取注解中的角色数组
         String[] limitedRoleCodeList=apiLimitedRole.limitedRoleCodeList();
         Set<String>limitedRoleCodeSet= Arrays.stream(limitedRoleCodeList).collect(Collectors.toSet());
         Set<String> roleCodeSet = userRoleList.stream().map(UserRole::getRoleCode).collect(Collectors.toSet());

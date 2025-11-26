@@ -36,6 +36,7 @@ public class DataRoleLimitedAspect {
     @Before("check()")
     public void doBefore(JoinPoint joinPoint) {
         Long userId = userSupport.getCurrentUserId();
+        //获取用户角色
         List<UserRole> userRoleList = userRoleService.getUserRoleByUserId(userId);
         Set<String> roleCodeSet = userRoleList.stream().map(UserRole::getRoleCode).collect(Collectors.toSet());
         Object[] args = joinPoint.getArgs();

@@ -3,7 +3,6 @@ package com.gduf.bilibili.api.support;
 import com.gduf.bilibili.exception.ConditionException;
 import com.gduf.bilibili.service.util.TokenUtil;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 

@@ -14,6 +14,7 @@
         select * from t_user_info where userId=#{userId}
     </select>
     <!--根据手机号或者邮箱查询用户-->
+    <!--子查询：从用户表中根据用户名或邮箱查出用户  从子查询结果中根据邮箱收集拼接模糊查询出用户-->
     <select id="getUserByPhoneOrEmail" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.User">
         select * from
             (select concat(phone,ifnull(email,''))as pe,u.*from t_user as u) as tmp

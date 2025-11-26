@@ -169,6 +169,7 @@ public class UserFollowingService {
      * @return
      */
     public List<UserInfo> checkFollowingStatus(List<UserInfo> userInfoList, Long userId) {
+        //获取当前登录用户关注的用户列表
         List<UserFollowing> followingList = userFollowingDao.getUserFollowings(userId);
         for (UserInfo userInfo : userInfoList) {
             userInfo.setFollowed(false);

@@ -94,11 +94,13 @@ public class UserService {
         String password = user.getPassword();
         String rawPassword;
         try {
+            //对密码进行解密
             rawPassword = RSAUtil.decrypt(password);
         } catch (Exception e) {
             throw new ConditionException("密码解密失败");
         }
         String salt = dbUser.getSalt();
+        //将前端传来的密码变成md5标识，再和数据库中的密码对比
         String md5Password = MD5Util.sign(rawPassword, salt, "UTF-8");
         if (!md5Password.equals(dbUser.getPassword())) {
             throw new ConditionException("密码错误");
@@ -201,12 +203,14 @@ public class UserService {
         String phoneOrEmail = phone + email;
         User dbUser = this.getUserByPhoneOrEmail(phoneOrEmail);
         String password = user.getPassword();
+        //解密密码
         String rawPassword;
         try {
             rawPassword = RSAUtil.decrypt(password);
         } catch (Exception e) {
             throw new ConditionException("密码解密失败");
         }
+        //解完密的密码还要转为md5，然后和数据库中的密码对比
         String salt = dbUser.getSalt();
         String md5Password = MD5Util.sign(rawPassword, salt, "UTF-8");
         if (!md5Password.equals(dbUser.getPassword())) {
@@ -215,6 +219,7 @@ public class UserService {
         Long userId = dbUser.getId();
         String accessToken = TokenUtil.generateToken(userId);
         String refreshToken = TokenUtil.generateRefreshToken(userId);
+        //更新用户的刷新令牌，现删除再添加
         userDao.deleteRefreshToken(refreshToken, userId);
         userDao.addRefreshToken(refreshToken, userId, new Date());
         Map<String, Object> result = new HashMap<>();

@@ -1,6 +1,5 @@
 package com.gduf.bilibili.api;
 
-import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import com.alibaba.fastjson.JSONObject;
 import com.gduf.bilibili.api.support.UserSupport;
 import com.gduf.bilibili.domain.JsonResponse;
@@ -13,7 +12,6 @@ import com.gduf.bilibili.service.util.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.Oneway;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
