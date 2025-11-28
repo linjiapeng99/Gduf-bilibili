@@ -92,6 +92,7 @@ public class WebSocketService {
                     WebSocketService webSocketService = entry.getValue();
                     DefaultMQProducer producer =(DefaultMQProducer) APPLICATION_CONTEXT.getBean("danmusProducer");
                     JSONObject jsonObject=new JSONObject();
+                    //将接收消息的sessionId和消息一起发出去，mq的消费者才知道将消息发给哪个客户端
                     jsonObject.put("sessionId",webSocketService.getSessionId());
                     jsonObject.put("message",message);
                     Message msg=new Message(UserMomentsConstant.TOPIC_DANMUS,jsonObject.toJSONString().getBytes(StandardCharsets.UTF_8));

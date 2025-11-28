@@ -110,8 +110,8 @@
         from t_video_collection
         where videoId = #{videoId}
     </select>
-    <!--根据用户id和视频id获取视频收藏几里路-->
-    <select id="getVideoCollectionByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoLike">
+    <!--根据用户id和视频id获取视频收藏记录-->
+    <select id="getVideoCollectionByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoCollection">
         select *
         from t_video_collection
         where userId = #{userId}

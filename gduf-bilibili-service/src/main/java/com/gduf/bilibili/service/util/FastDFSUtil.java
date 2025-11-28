@@ -94,10 +94,10 @@ public class FastDFSUtil {
         //Redis中存储文件分片是第几片的键
         String uploadNoKey = UPLOAD_NO_KEY + fileMd5;
         Long uploadSize = 0L;
-        //从Redis中拿文件大小
+        //从Redis中拿文件已上传的总大小
         String uploadSizeStr = redisTemplate.opsForValue().get(uploadSizeKey);
         if (!StringUtils.isNullOrEmpty(uploadSizeStr)) {
-            //如果Redis中文件大小存在，则需要对其进行初始化
+            //如果Redis中文件总大小存在，则需要对其进行初始化
             uploadSize = Long.valueOf(uploadSizeStr);
         }
         String fileType = this.getFileType(file);

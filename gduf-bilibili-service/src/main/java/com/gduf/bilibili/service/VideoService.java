@@ -198,11 +198,11 @@ public class VideoService {
         }
         Long count = videoDao.getVideoCollectionsByVideoId(videoId);
         //如果userId确实存在，那么就查询当前用户对该视频是否进行了点赞
-        VideoLike videoLike = videoDao.getVideoCollectionByVideoIdAndUserId(userId, videoId);
-        Boolean like = videoLike != null;
+        VideoCollection videoCollection = videoDao.getVideoCollectionByVideoIdAndUserId(userId, videoId);
+        Boolean like = videoCollection != null;
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
-        result.put("like", like);
+        result.put("videoCollection", videoCollection);
         return result;
     }
 
@@ -261,9 +261,9 @@ public class VideoService {
         }
         Long count = videoDao.getVideoCoinAmount(video);
         VideoCoin videoCoin = videoDao.getVideoCoinByVideoIdAndUserId(userId, videoId);
-        boolean like = videoCoin != null;
+        boolean coin = videoCoin != null;
         Map<String, Object> result = new HashMap<>();
-        result.put("like", like);
+        result.put("coin", coin);
         result.put("count", count);
         return result;
     }
@@ -409,7 +409,7 @@ public class VideoService {
     }
 
     public List<VideoBinaryPicture> convertVideoToImage(Long videoId, String fileMd5) throws Exception {
-        //根据文件唯一 标识获取数据库文件
+        //根据文件唯一标识获取数据库文件
         File file = fileService.getFileByMd5(fileMd5);
         String filePath = "D:\\p" + videoId + file.getType();
         //到文件服务器上下载该视频，并放到指定目录，之所以要下载是因为我们现在用的服务器是单机版的，可以在本地操作，但是现实中可能服务器是分布式的，所以一个文件可能在不同的服务器上

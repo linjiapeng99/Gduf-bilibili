@@ -36,7 +36,7 @@ public interface VideoDao {
 
     Long getVideoCollectionsByVideoId(Long videoId);
 
-    VideoLike getVideoCollectionByVideoIdAndUserId(@Param("userId") Long userId, @Param("videoId") Long videoId);
+    VideoCollection getVideoCollectionByVideoIdAndUserId(@Param("userId") Long userId, @Param("videoId") Long videoId);
 
     VideoCoin getVideoCoinByVideoIdAndUserId(@Param("userId") Long userId, @Param("videoId") Long videoId);
 
