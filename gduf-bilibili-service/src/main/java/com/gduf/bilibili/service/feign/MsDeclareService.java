@@ -1,3 +1,4 @@
+/*
 package com.gduf.bilibili.service.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -17,3 +18,4 @@ public interface MsDeclareService {
     @GetMapping("/timeout")
     public String timeout(@RequestParam Long time);
 }
+*/

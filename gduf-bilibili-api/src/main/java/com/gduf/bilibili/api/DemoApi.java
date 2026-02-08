@@ -4,7 +4,7 @@ import com.gduf.bilibili.domain.JsonResponse;
 import com.gduf.bilibili.domain.Video;
 import com.gduf.bilibili.service.DemoService;
 import com.gduf.bilibili.service.ElasticSearchService;
-import com.gduf.bilibili.service.feign.MsDeclareService;
+//import com.gduf.bilibili.service.feign.MsDeclareService;
 import com.gduf.bilibili.service.util.FastDFSUtil;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
@@ -27,8 +27,8 @@ public class DemoApi {
     @Autowired
     private ElasticSearchService elasticSearchService;
 
-    @Autowired
-    private MsDeclareService msDeclareService;
+    /*@Autowired
+    private MsDeclareService msDeclareService;*/
     @GetMapping("/query")
     public Long getById(Long id){
        return demoService.query(id);

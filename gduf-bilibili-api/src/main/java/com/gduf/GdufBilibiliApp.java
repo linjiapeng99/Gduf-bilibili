@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAsync
 @EnableTransactionManagement
 @EnableScheduling
-@EnableFeignClients(basePackages = "com.gduf.bilibili.service.feign")//feign要扫的包
+//@EnableFeignClients(basePackages = "com.gduf.bilibili.service.feign")//feign要扫的包
 @EnableHystrix
 public class GdufBilibiliApp {
     public static void main(String[] args) {
