@@ -29,7 +29,7 @@
         (videoId, tagId, createTime)
         values
         <foreach collection="tagList" item="videoTag" separator=",">
-            (#{videoTag.videoId},#{tagId},#{createTime})
+            (#{videoTag.videoId},#{videoTag.tagId},#{videoTag.createTime})
         </foreach>
     </insert>
     <!--查询视频条数-->
@@ -54,6 +54,7 @@
         <if test="area!=null and area!=''">
             and area=#{area}
         </if>
+        LIMIT #{start},#{limit}
     </select>
     <!--根据视频id获取视频标签列表-->
     <select id="getVideoTagsByVideoId" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.VideoTag">

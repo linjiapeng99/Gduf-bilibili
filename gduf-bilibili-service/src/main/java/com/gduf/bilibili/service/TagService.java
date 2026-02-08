@@ -13,9 +13,10 @@ public class TagService {
     @Autowired
     private TagDao tagDao;
 
-    public void addTags(Tag tag) {
+    public Long addTags(Tag tag) {
         tag.setCreateTime(new Date());
         tagDao.addTags(tag);
+        return tag.getId();
     }
 
     public List<Tag> getTags(String name) {

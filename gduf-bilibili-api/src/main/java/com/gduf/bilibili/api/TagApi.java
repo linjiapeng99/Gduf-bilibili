@@ -19,9 +19,9 @@ public class TagApi {
      * @return 默认
      */
     @PostMapping("tags")
-    public JsonResponse<String>addTags(@RequestBody Tag tag){
-        tagService.addTags(tag);
-        return JsonResponse.success();
+    public JsonResponse<Long>addTags(@RequestBody Tag tag){
+        Long tagId=tagService.addTags(tag);
+        return JsonResponse.success(tagId);
     }
 
     /**

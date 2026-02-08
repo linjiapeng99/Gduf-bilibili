@@ -61,7 +61,8 @@ public class VideoService {
     private FileService fileService;
     @Autowired
     private ImageUtil imageUtil;
-    private final static int FRAME_NO=256;
+    private final static int FRAME_NO = 256;
+
     /**
      * 添加视频
      *
@@ -431,34 +432,34 @@ public class VideoService {
             long timestamp = fFmpegFrameGrabber.getTimestamp();
             //截取桢
             frame = fFmpegFrameGrabber.grabImage();
-            if(count==i){
-                if(frame==null){
-                    throw  new ConditionException("无效桢");
+            if (count == i) {
+                if (frame == null) {
+                    throw new ConditionException("无效桢");
                 }
                 //将桢转为BufferedImage（图片的数据形式）
-                BufferedImage bufferedImage=converter.getBufferedImage(frame);
-                ByteArrayOutputStream os=new ByteArrayOutputStream();
+                BufferedImage bufferedImage = converter.getBufferedImage(frame);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
                 //将图片转为png形式
-                ImageIO.write(bufferedImage,"png",os);
-                InputStream inputStream=new ByteArrayInputStream(os.toByteArray());
+                ImageIO.write(bufferedImage, "png", os);
+                InputStream inputStream = new ByteArrayInputStream(os.toByteArray());
                 //调用百度 api输出黑白剪影文件
-                java.io.File outputFile=java.io.File.createTempFile("convert-"+videoId+"-",".png");
+                java.io.File outputFile = java.io.File.createTempFile("convert-" + videoId + "-", ".png");
                 BufferedImage binaryImg = imageUtil.getBodyOutline(bufferedImage, inputStream);
-                ImageIO.write(binaryImg,"png",outputFile);
+                ImageIO.write(binaryImg, "png", outputFile);
                 //上传视频剪影文件
-                String imgUrl=fastDFSUtil.uploadCommonFile((MultipartFile) outputFile);
-                VideoBinaryPicture videoBinaryPicture=new VideoBinaryPicture();
+                String imgUrl = fastDFSUtil.uploadCommonFile((MultipartFile) outputFile);
+                VideoBinaryPicture videoBinaryPicture = new VideoBinaryPicture();
                 videoBinaryPicture.setFrameNo(i);
                 videoBinaryPicture.setUrl(imgUrl);
                 videoBinaryPicture.setVideoId(videoId);
                 videoBinaryPicture.setVideoTimeStamp(timestamp);
                 pictures.add(videoBinaryPicture);
-                count+=FRAME_NO;
+                count += FRAME_NO;
                 outputFile.delete();
             }
 
         }
-        java.io.File tamFile=new java.io.File(filePath);
+        java.io.File tamFile = new java.io.File(filePath);
         tamFile.delete();
         //批量添加视频剪影文件
         videoDao.batchAddBinaryPictures(pictures);

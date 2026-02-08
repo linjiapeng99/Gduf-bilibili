@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gduf.bilibili.dao.TagDao">
     <!--新增标签-->
-    <insert id="addTags" parameterType="com.gduf.bilibili.domain.Tag">
+    <insert id="addTags" parameterType="com.gduf.bilibili.domain.Tag"  useGeneratedKeys="true" keyProperty="id">
         insert into
             t_tag(name, createTime)
         values

@@ -87,7 +87,7 @@ public class RockerMQConfig {
         consumer.start();
         return consumer;
     }
-    //弹幕 生产者
+    //弹幕生产者
     @Bean("danmusProducer")
     public DefaultMQProducer danmusProducer() throws MQClientException {
         DefaultMQProducer producer=new DefaultMQProducer(UserMomentsConstant.GRUOP_DANMUS);

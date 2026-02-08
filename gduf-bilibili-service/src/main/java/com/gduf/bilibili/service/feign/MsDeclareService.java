@@ -14,4 +14,6 @@ public interface MsDeclareService {
     public Long msget(@RequestParam Long id);
     @PostMapping("demos")
     public Map<String, Object>mspost(@RequestBody Map<String,Object>params);
+    @GetMapping("/timeout")
+    public String timeout(@RequestParam Long time);
 }

@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface CollectionGroupDao {
 
-    Integer addUserFollowingGroups(CollectionGroup collectionGroup);
+    Integer addCollectionGroup(CollectionGroup collectionGroup);
 
     List<CollectionGroup> getCollectionGroups(Long userId);
 }

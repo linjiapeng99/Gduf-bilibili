@@ -17,7 +17,7 @@ public class CollectionGroupService {
     public Long addCollectionGroup(CollectionGroup collectionGroup) {
         collectionGroup.setCreateTime(new Date());
         collectionGroup.setType(VideoConstant.COLLECTION_GROUP_TYPE_VIDEO);
-        collectionGroupDao.addUserFollowingGroups(collectionGroup);
+        collectionGroupDao.addCollectionGroup(collectionGroup);
         return collectionGroup.getId();
     }
 

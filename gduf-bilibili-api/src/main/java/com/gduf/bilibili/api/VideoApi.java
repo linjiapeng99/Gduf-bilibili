@@ -47,7 +47,7 @@ public class VideoApi {
      * @return
      */
     @GetMapping("/videos")
-    public JsonResponse<PageResult<Video>> pageListVideos(Integer pageNo, Integer pageSize, String area) {
+    public JsonResponse<PageResult<Video>> pageListVideos(@RequestParam("no") Integer pageNo,@RequestParam("size") Integer pageSize,String area) {
         PageResult<Video> result = videoService.pageListVideos(pageNo, pageSize, area);
         return JsonResponse.success(result);
     }
@@ -104,8 +104,7 @@ public class VideoApi {
         Long userId = null;
         try {
             userId = userSupport.getCurrentUserId();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         Map<String, Object> result = videoService.getVideoLikes(userId, videoId);
         return JsonResponse.success(result);
     }
