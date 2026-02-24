@@ -19,4 +19,13 @@
     <select id="getUserFans" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserFollowing">
         select * from t_user_following where followingId=#{userId}
     </select>
+
+    <update id="updateUserFollowings">
+        update
+            t_user_following
+        set
+            groupId = #{groupId}
+        where
+            userId = #{userId} and followingId = #{followingId}
+    </update>
 </mapper>

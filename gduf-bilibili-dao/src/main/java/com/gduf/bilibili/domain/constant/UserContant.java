@@ -1,6 +1,6 @@
 package com.gduf.bilibili.domain.constant;
 
-public class UserContant {
+public interface UserContant {
     public static final String GENDER_MALE="0";
 
     public static final String GENDER_DEMALE="1";

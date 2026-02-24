@@ -6,6 +6,7 @@ import com.gduf.bilibili.domain.JsonResponse;
 import com.gduf.bilibili.service.DanmuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class DanmuApi {
      * @return
      */
     @GetMapping("/danmus")
-    public JsonResponse<List<Danmu>>getDanmus(Long videoId,String startTime,String endTime) throws Exception {
+    public JsonResponse<List<Danmu>>getDanmus(@RequestParam Long videoId, String startTime, String endTime) throws Exception {
         List<Danmu>list;
         try{
             //判断当前是游客模式还是用户模式，报错走catch逻辑则是游客模式

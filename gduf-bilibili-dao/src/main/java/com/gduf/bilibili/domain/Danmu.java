@@ -11,7 +11,7 @@ public class Danmu {
 
     private String content;
 
-    private Date danmuTime;
+    private String danmuTime;
 
     private Date createTime;
 
@@ -31,11 +31,11 @@ public class Danmu {
         this.createTime = createTime;
     }
 
-    public Date getDanmuTime() {
+    public String getDanmuTime() {
         return danmuTime;
     }
 
-    public void setDanmuTime(Date danmuTime) {
+    public void setDanmuTime(String danmuTime) {
         this.danmuTime = danmuTime;
     }
 

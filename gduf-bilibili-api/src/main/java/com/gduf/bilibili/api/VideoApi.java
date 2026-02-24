@@ -63,7 +63,7 @@ public class VideoApi {
     @GetMapping("/video-slices")
     public void viewVideoOnlineBySlices(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        String path) throws Exception {
+                                        @RequestParam("url")String path) throws Exception {
         videoService.viewVideoOnlineBySlices(request, response, path);
     }
 
@@ -151,6 +151,15 @@ public class VideoApi {
         Map<String, Object> result = videoService.getVideoCollections(userId, videoId);
         return JsonResponse.success(result);
     }
+    /**
+     * 更新收藏视频
+     */
+    @PutMapping("/video-collections")
+    public JsonResponse<String> updateVideoCollection(@RequestBody VideoCollection videoCollection){
+        Long userId = userSupport.getCurrentUserId();
+        videoService.updateVideoCollection(videoCollection, userId);
+        return JsonResponse.success();
+    }
 
     /**
      * 添加收藏分组
@@ -232,8 +241,8 @@ public class VideoApi {
      */
     @GetMapping("/video-comments")
     public JsonResponse<PageResult<VideoComment>> pageListVideoComments(
-            @RequestParam Integer pageNo,
-            @RequestParam Integer pageSize,
+            @RequestParam("no") Integer pageNo,
+            @RequestParam("size") Integer pageSize,
             @RequestParam Long videoId) {
         PageResult<VideoComment> result = videoService.pageListVideoComments(pageNo, pageSize, videoId);
         return JsonResponse.success(result);

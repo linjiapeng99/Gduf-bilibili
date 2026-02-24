@@ -5,6 +5,8 @@ import java.util.List;
 
 public class CollectionGroup {
 
+    private Long groupId;
+
     private Long id;
 
     private Long userId;
@@ -19,6 +21,22 @@ public class CollectionGroup {
 
     private Date updateTime;
 
+    private Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
     public List<Video> getVideoList() {
         return videoList;
     }

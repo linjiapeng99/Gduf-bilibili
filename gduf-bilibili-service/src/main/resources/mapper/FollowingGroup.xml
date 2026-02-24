@@ -3,7 +3,7 @@
 <mapper namespace="com.gduf.bilibili.dao.FollowingGroupDao">
     <!--根据类型查询关注分类信息-->
     <select id="getByType" parameterType="java.lang.String" resultType="com.gduf.bilibili.domain.FollowingGroup">
-        select * from t_following_group where 'type' =#{type}
+        select * from t_following_group where type =#{type}
     </select>
     <!--根据分组id查询关注分类-->
     <select id="getById" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.FollowingGroup">

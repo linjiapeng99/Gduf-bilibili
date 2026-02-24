@@ -6,10 +6,7 @@ import com.gduf.bilibili.domain.JsonResponse;
 import com.gduf.bilibili.domain.UserFollowing;
 import com.gduf.bilibili.service.UserFollowingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +26,8 @@ public class UserFollowingApi {
      */
     @PostMapping("/user-followings")
     public JsonResponse<String> addUserFollowings(@RequestBody UserFollowing userFollowing) {
+        Long userId = userSupport.getCurrentUserId();
+        userFollowing.setUserId(userId);
         userFollowingService.addUserFollowings(userFollowing);
         return JsonResponse.success();
     }
@@ -43,6 +42,21 @@ public class UserFollowingApi {
         Long userId = userSupport.getCurrentUserId();
         List<FollowingGroup> userFollowings = userFollowingService.getUserFollowings(userId);
         return JsonResponse.success(userFollowings);
+    }
+
+    @PutMapping("/user-followings")
+    public JsonResponse<String> updateUserFollowings(@RequestBody UserFollowing userFollowing){
+        Long userId = userSupport.getCurrentUserId();
+        userFollowing.setUserId(userId);
+        userFollowingService.updateUserFollowings(userFollowing);
+        return JsonResponse.success();
+    }
+    //新增取消关注接口
+    @DeleteMapping("/user-followings")
+    public JsonResponse<String> deleteUserFollowing(@RequestParam Long followingId){
+        Long userId = userSupport.getCurrentUserId();
+        userFollowingService.deleteUserFollowing(userId, followingId);
+        return JsonResponse.success();
     }
 
     /**

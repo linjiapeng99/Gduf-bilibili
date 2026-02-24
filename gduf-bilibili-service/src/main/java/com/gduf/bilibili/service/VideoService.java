@@ -28,9 +28,11 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -61,6 +63,8 @@ public class VideoService {
     private FileService fileService;
     @Autowired
     private ImageUtil imageUtil;
+    @Value("${fdfs.http.storage-addr}")
+    private String fastdfsUrl;
     private final static int FRAME_NO = 256;
 
     /**
@@ -105,6 +109,10 @@ public class VideoService {
         Integer total = videoDao.pageCountVideo(params);
         if (total > 0) {
             list = videoDao.pageListVideos(params);
+            //视频封面相对路径转为绝对路径
+            list.forEach(video -> video.setThumbnail(fastdfsUrl + video.getThumbnail()));
+            //统计播放量和弹幕量
+            list = this.getVideoCount(list);
             List<VideoTag> tagList = new ArrayList<>();
             for (Video video : list) {
                 Long videoId = video.getId();
@@ -113,6 +121,39 @@ public class VideoService {
             }
         }
         return new PageResult<>(total, list);
+    }
+    public List<Video> getVideoCount(List<Video> videoList){
+        if(!videoList.isEmpty()){
+            //获取视频id集合
+            Set<Long> videoIdSet = videoList.stream().map(Video :: getId)
+                    .collect(Collectors.toSet());
+            //统计播放量
+            Map<Long, Integer> viewCountMap = this.batchCountVideoView(videoIdSet);
+            //统计弹幕量
+            Map<Long, Integer> danmuCountMap = this.batchCountVideoDanmu(videoIdSet);
+            //构建返回数据
+            videoList.forEach(video -> {
+                video.setViewCount(viewCountMap.get(video.getId()));
+                video.setDanmuCount(danmuCountMap.get(video.getId()));
+            });
+        }
+        return videoList;
+    }
+
+    //统计视频播放量
+    public Map<Long, Integer>  batchCountVideoView(Set<Long> videoIdSet){
+        List<VideoViewCount> viewCount = videoDao.getVideoViewCountByVideoIds(videoIdSet);
+        return viewCount.stream()
+                .collect(Collectors.toMap(VideoViewCount::getVideoId,
+                        VideoViewCount::getCount));
+    }
+
+    //统计视频弹幕量
+    public Map<Long, Integer> batchCountVideoDanmu(Set<Long> videoIdSet){
+        List<VideoDanmuCount> danmuCount = videoDao.getVideoDanmuCountByVideoIds(videoIdSet);
+        return danmuCount.stream()
+                .collect(Collectors.toMap(VideoDanmuCount::getVideoId,
+                        VideoDanmuCount::getCount));
     }
 
     /**
@@ -192,6 +233,21 @@ public class VideoService {
         videoDao.deleteVideoCollection(userId, videoId);
     }
 
+    /*更新视频收藏*/
+    @Transactional
+    public void updateVideoCollection(VideoCollection videoCollection, Long userId) {
+        Long videoId = videoCollection.getVideoId();
+        Long groupId = videoCollection.getGroupId();
+        if(videoId == null || groupId == null){
+            throw new ConditionException("参数异常！");
+        }
+        Video video = videoDao.getVideoById(videoId);
+        if(video == null){
+            throw new ConditionException("非法视频！");
+        }
+        videoCollection.setUserId(userId);
+        videoDao.updateVideoCollection(videoCollection);
+    }
     public Map<String, Object> getVideoCollections(Long userId, Long videoId) {
         Video video = videoDao.getVideoById(videoId);
         if (video == null) {
@@ -260,7 +316,7 @@ public class VideoService {
         if (video == null) {
             throw new ConditionException("非法视频");
         }
-        Long count = videoDao.getVideoCoinAmount(video);
+        Long count = videoDao.getVideoCoinAmount(videoId);
         VideoCoin videoCoin = videoDao.getVideoCoinByVideoIdAndUserId(userId, videoId);
         boolean coin = videoCoin != null;
         Map<String, Object> result = new HashMap<>();
@@ -300,31 +356,33 @@ public class VideoService {
         if (total > 0) {
             //这里查的是一级评论
             list = videoDao.pageListVideoComments(params);
-            //批量查询二级评论
-            List<Long> parentIds = list.stream().map(VideoComment::getId).collect(Collectors.toList());
-            List<VideoComment> childCommentList = videoDao.batchGetVideoCommentsByRootIds(parentIds);
-            //一级评论用户id
-            Set<Long> userIdList = list.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
-            //二级评论用户id
-            Set<Long> childIdSet = childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
-            //二级评论回复用户id
-            //Set<Long> replyUserIdList = childCommentList.stream().map(VideoComment::getReplyUserId).collect(Collectors.toSet());
-            userIdList.addAll(childIdSet);
-            List<UserInfo> userInfoList = userService.batchGetUserInfoByUserIds(userIdList);
-            Map<Long, UserInfo> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfo::getUserId, userInfo -> userInfo));
-            list.forEach(comment -> {
-                Long id = comment.getId();
-                List<VideoComment> childList = new ArrayList<>();
-                childCommentList.forEach(child -> {
-                    if (id.equals(child.getRootId())) {
-                        child.setUserInfo(userInfoMap.get(child.getUserId()));
-                        child.setReplyUserInfo(userInfoMap.get(child.getReplyUserId()));
-                        childList.add(child);
-                    }
+            if(!list.isEmpty()){
+                //批量查询二级评论
+                List<Long> parentIds = list.stream().map(VideoComment::getId).collect(Collectors.toList());
+                List<VideoComment> childCommentList = videoDao.batchGetVideoCommentsByRootIds(parentIds);
+                //一级评论用户id
+                Set<Long> userIdList = list.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
+                //二级评论用户id
+                Set<Long> childIdSet = childCommentList.stream().map(VideoComment::getUserId).collect(Collectors.toSet());
+                //二级评论回复用户id
+                //Set<Long> replyUserIdList = childCommentList.stream().map(VideoComment::getReplyUserId).collect(Collectors.toSet());
+                userIdList.addAll(childIdSet);
+                List<UserInfo> userInfoList = userService.batchGetUserInfoByUserIds(userIdList);
+                Map<Long, UserInfo> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfo::getUserId, userInfo -> userInfo));
+                list.forEach(comment -> {
+                    Long id = comment.getId();
+                    List<VideoComment> childList = new ArrayList<>();
+                    childCommentList.forEach(child -> {
+                        if (id.equals(child.getRootId())) {
+                            child.setUserInfo(userInfoMap.get(child.getUserId()));
+                            child.setReplyUserInfo(userInfoMap.get(child.getReplyUserId()));
+                            childList.add(child);
+                        }
+                    });
+                    comment.setChildList(childList);
+                    comment.setUserInfo(userInfoMap.get(comment.getUserId()));
                 });
-                comment.setChildList(childList);
-                comment.setUserInfo(userInfoMap.get(comment.getUserId()));
-            });
+            }
         }
         return new PageResult<>(total, list);
     }

@@ -6,6 +6,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.Documented;
 import java.util.Date;
 import java.util.List;
@@ -15,9 +16,9 @@ public class Video {
     private Long id;
 
     private Long userId;//用户id
-
+    @NotNull
     private String url; //视频链接
-
+    @NotNull
     private String thumbnail;//封面
     @Field(type = FieldType.Text)
     private String title; //标题

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.gduf.bilibili.dao.DanmuDao;
 import com.gduf.bilibili.domain.Danmu;
 import com.mysql.cj.util.StringUtils;
+import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -26,7 +27,7 @@ public class DanmuService {
         danmuDao.addDanmu(danmu);
     }
     @Async
-    public void AsycAddDanmu(Danmu danmu){
+    public void asycAddDanmu(Danmu danmu){
         danmuDao.addDanmu(danmu);
     }
 
@@ -35,21 +36,21 @@ public class DanmuService {
         String key=DANMU_KEY+danmu.getVideoId();
         String value=redisTemplate.opsForValue().get(key);
         List<Danmu>list=new ArrayList<>();
-        if(!StringUtils.isNullOrEmpty(value)){
+        if(!StringUtil.isNullOrEmpty(value)){
             list= JSONArray.parseArray(value,Danmu.class);
         }
         list.add(danmu);
-        redisTemplate.opsForValue().set(key,JSONObject.toJSONString(danmu));
+        redisTemplate.opsForValue().set(key,JSONObject.toJSONString(list));
     }
 
     public List<Danmu> getDanmus(Long videoId, String startTime, String endTime) throws Exception {
         String key=DANMU_KEY+videoId;
         String value = redisTemplate.opsForValue().get(key);
         List<Danmu>list;
-        if(!StringUtils.isNullOrEmpty(value)){//缓存中存在
+        if(!StringUtil.isNullOrEmpty(value)){//缓存中存在
             //拿出redis这个视频的所有弹幕
             list=JSONArray.parseArray(value,Danmu.class);
-            if(!StringUtils.isNullOrEmpty(startTime)&& !StringUtils.isNullOrEmpty(endTime)){
+            if(!StringUtil.isNullOrEmpty(startTime)&& !StringUtil.isNullOrEmpty(endTime)){
                 SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date startDate=sdf.parse(startTime);
                 Date endDate=sdf.parse(endTime);

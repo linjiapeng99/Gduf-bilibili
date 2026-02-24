@@ -217,7 +217,7 @@ public class FastDFSUtil {
         //获取请求分片的实际大小
         int len = (int) (end - begin + 1);
         //设置一些必要的响应头及响应状态码
-        String contentRange = "bytes" + begin + "-" + end + "/" + totalFileSize;
+        String contentRange = "bytes " + begin + "-" + end + "/" + totalFileSize;
         response.setHeader("Content-Range",contentRange);
         response.setHeader("Accept-Ranges","bytes");
         response.setHeader("Content-Type","video/mp4");

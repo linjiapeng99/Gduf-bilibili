@@ -118,6 +118,15 @@
         where userId = #{userId}
           and videoId = #{videoId}
     </select>
+
+    <update id="updateVideoCollection">
+        update
+            t_video_collection
+        set
+            groupId = #{groupId}
+        where
+            videoId = #{videoId} and userId = #{userId}
+    </update>
     <!--根据用户id和视频id查询用户投币记录-->
     <select id="getVideoCoinByVideoIdAndUserId" resultType="com.gduf.bilibili.domain.VideoCoin">
         select *
@@ -186,7 +195,7 @@
             and clientId=#{clientId}
         </if>
         <if test="userId!=null">
-            userId=#{userId}
+            and userId=#{userId}
         </if>
         <if test="ip==null and ip!=''">
             and ip=#{ip}
@@ -238,4 +247,31 @@
             (#{picture.videoId},#{picture.frameNo},#{url},#{picture.videoTimeStamp},#{picture.createTime})
         </foreach>
     </insert>
+    <select id="getVideoDanmuCountByVideoIds" resultType="com.gduf.bilibili.domain.VideoDanmuCount">
+        select
+        videoId,
+        count( id ) count
+        from
+        t_danmu
+        where
+        videoId in
+        <foreach collection="videoIds" item="videoId" open="(" close=")" separator=",">
+            #{videoId}
+        </foreach>
+        GROUP BY videoId
+    </select>
+
+    <select id="getVideoViewCountByVideoIds" resultType="com.gduf.bilibili.domain.VideoViewCount">
+        SELECT
+        videoId,
+        count( id ) count
+        FROM
+        t_video_view
+        WHERE
+        videoId in
+        <foreach collection="videoIds" item="videoId" open="(" close=")" separator=",">
+            #{videoId}
+        </foreach>
+        GROUP BY videoId
+    </select>
 </mapper>

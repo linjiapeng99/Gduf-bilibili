@@ -53,7 +53,7 @@ public class WebSocketService {
     @OnOpen
     public void openConnection(Session session,@PathParam("token") String token){
         try{
-            Long userId = TokenUtil.verifyToken(token);
+            this.userId = TokenUtil.verifyToken(token);
         }catch (Exception ignored){}
         this.sessionId=session.getId();
         this.session=session;
@@ -79,7 +79,7 @@ public class WebSocketService {
             WEBSOCKET_MAP.remove(sessionId);
             ONLINE_COUNT.getAndDecrement();
         }
-        logger.info("用户退出："+sessionId+",当前在线人数为："+ONLINE_COUNT);
+        logger.info("用户退出："+sessionId+",当前在线人数为："+ONLINE_COUNT.get());
     }
 
     @OnMessage
@@ -109,11 +109,11 @@ public class WebSocketService {
                     danmu.setUserId(userId);
                     danmu.setCreateTime(new Date());
                     DanmuService danmuService =(DanmuService) APPLICATION_CONTEXT.getBean("danmuService");
-                    danmuService.addDanmu(danmu);
+                    danmuService.asycAddDanmu(danmu);
                     danmuService.addDanmusToRedis(danmu);
                 }
             }catch (Exception e){
-                logger.error("弹幕接收异常");
+                logger.error("");
                 e.printStackTrace();
             }
         }

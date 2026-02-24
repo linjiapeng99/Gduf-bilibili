@@ -18,6 +18,16 @@ public class FollowingGroup {
 
     private List<UserInfo>followingUserInfoList;
 
+    private Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
     public List<UserInfo> getFollowingUserInfoList() {
         return followingUserInfoList;
     }
