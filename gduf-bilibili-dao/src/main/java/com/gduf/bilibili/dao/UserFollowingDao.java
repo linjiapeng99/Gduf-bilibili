@@ -19,4 +19,6 @@ public interface UserFollowingDao {
     List<UserFollowing> getUserFans(Long userId);
 
     void updateUserFollowings(UserFollowing userFollowing);
+
+    Integer getUserFansCount(Long userId);
 }

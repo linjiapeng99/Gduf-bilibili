@@ -15,6 +15,13 @@ public class UserMoments {
 
     private Date updateTime;
 
+    //辅助字段
+    private Content content;
+
+    //辅助字段
+    private UserInfo userInfo;
+
+
     public Long getContentId() {
         return contentId;
     }
@@ -62,4 +69,20 @@ public class UserMoments {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+    public Content getContent() {
+        return content;
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
 }

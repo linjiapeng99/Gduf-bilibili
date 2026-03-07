@@ -29,6 +29,16 @@ public class UserInfo {
     private Date createTime;
     @Field(type = FieldType.Date)
     private Date updateTime;
+    @Field(type = FieldType.Integer)
+    private Integer fanCount;
+
+    public Integer getFanCount() {
+        return fanCount;
+    }
+
+    public void setFanCount(Integer fanCount) {
+        this.fanCount = fanCount;
+    }
 
     public Boolean getFollowed() {
         return followed;

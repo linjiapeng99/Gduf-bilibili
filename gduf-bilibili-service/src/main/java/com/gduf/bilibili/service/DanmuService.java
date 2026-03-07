@@ -21,6 +21,8 @@ public class DanmuService {
     private DanmuDao danmuDao;
     @Autowired
     private RedisTemplate<String, String>redisTemplate;
+    @Autowired
+    private ElasticSearchService elasticSearchService;
 
     private static final String DANMU_KEY="danmu-video-";
     public void addDanmu(Danmu danmu){
@@ -29,6 +31,7 @@ public class DanmuService {
     @Async
     public void asycAddDanmu(Danmu danmu){
         danmuDao.addDanmu(danmu);
+        elasticSearchService.updateVideoDanmuCount(danmu.getVideoId());
     }
 
 

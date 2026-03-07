@@ -23,6 +23,8 @@ public class UserService {
     private UserDao userDao;
     @Autowired
     private UserAuthService userAuthService;
+    @Autowired
+    private ElasticSearchService elasticSearchService;
 
     /**
      * 用户注册
@@ -63,6 +65,8 @@ public class UserService {
         userDao.addUserInfo(userInfo);
         //添加用户默认角色
         userAuthService.addUserDefaultRole(user.getId());
+        //新增es中的用户信息
+        elasticSearchService.addUserInfo(userInfo);
     }
 
     /**
@@ -159,10 +163,15 @@ public class UserService {
     public void updateUserInfo(UserInfo userInfo) {
         userInfo.setUpdateTime(new Date());
         userDao.updateUserInfo(userInfo);
+        if (userInfo.getId() == null) {
+            userInfo = userDao.selectUserInfoByUserId(userInfo.getUserId());
+        }
+        elasticSearchService.updateUserInfo(userInfo);
     }
 
     /**
      * 根据用户id获取用户
+     *
      * @param followingId
      * @return
      */
@@ -246,8 +255,8 @@ public class UserService {
      */
     public String refreshToken(String refreshToken) throws Exception {
         RefreshTokenDetail refreshTokenDetail = userDao.getRefreshTokenDetail(refreshToken);
-        if(refreshTokenDetail==null){
-            throw new ConditionException("555","token过期");
+        if (refreshTokenDetail == null) {
+            throw new ConditionException("555", "token过期");
         }
         Long userId = refreshTokenDetail.getUserId();
         String accessToken = TokenUtil.generateToken(userId);

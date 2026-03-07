@@ -5,6 +5,7 @@ import com.gduf.bilibili.domain.Danmu;
 import com.gduf.bilibili.domain.constant.UserContant;
 import com.gduf.bilibili.domain.constant.UserMomentsConstant;
 import com.gduf.bilibili.service.DanmuService;
+import com.gduf.bilibili.service.ElasticSearchService;
 import com.gduf.bilibili.service.config.WebSocketConfig;
 import com.gduf.bilibili.service.util.RocketMQUtil;
 import com.gduf.bilibili.service.util.TokenUtil;
@@ -90,15 +91,15 @@ public class WebSocketService {
                 //群发消息
                 for(Map.Entry<String, WebSocketService> entry:WEBSOCKET_MAP.entrySet()){
                     WebSocketService webSocketService = entry.getValue();
-                    DefaultMQProducer producer =(DefaultMQProducer) APPLICATION_CONTEXT.getBean("danmusProducer");
+                    /*DefaultMQProducer producer =(DefaultMQProducer) APPLICATION_CONTEXT.getBean("danmusProducer");
                     JSONObject jsonObject=new JSONObject();
                     //将接收消息的sessionId和消息一起发出去，mq的消费者才知道将消息发给哪个客户端
                     jsonObject.put("sessionId",webSocketService.getSessionId());
                     jsonObject.put("message",message);
                     Message msg=new Message(UserMomentsConstant.TOPIC_DANMUS,jsonObject.toJSONString().getBytes(StandardCharsets.UTF_8));
                     //异步发送
-                    RocketMQUtil.ayncSendMessage(producer,msg);
-
+                    RocketMQUtil.ayncSendMessage(producer,msg);*/
+                    webSocketService.sendMessage(message);
                     /*if(webSocketService.session.isOpen()){
                         webSocketService.sendMessage(message);
                     }*/

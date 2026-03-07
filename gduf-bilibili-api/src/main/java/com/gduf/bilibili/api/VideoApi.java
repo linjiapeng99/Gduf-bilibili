@@ -276,6 +276,8 @@ public class VideoApi {
         } catch (Exception e) {
             videoService.addVideoView(videoView, httpServletRequest);
         }
+        //同步更新视频播放量到Elasticsearch
+        elasticSearchService.updateVideoViewCount(videoView.getVideoId());
         return JsonResponse.success();
     }
 
@@ -301,6 +303,25 @@ public class VideoApi {
         Long userId = userSupport.getCurrentUserId();
         List<Video> list = videoService.recommend(userId);
         return JsonResponse.success(list);
+    }
+
+    /**
+     * 视频内容推荐(游客版)
+     */
+    @GetMapping("/visitor-video-recommendations")
+    public JsonResponse<List<Video>> getVisitorVideoRecommendations() {
+        List<Video> list = videoService.getVisitorVideoRecommendations();
+        return new JsonResponse<>(list);
+    }
+
+    /**
+     * 视频内容推荐(整合版)
+     */
+    @GetMapping("/video-recommendations")
+    public JsonResponse<List<Video>> getVideoRecommendations(@RequestParam String recommendType) {
+        Long userId = userSupport.getCurrentUserId();
+        List<Video> list = videoService.getVideoRecommendations(recommendType, userId);
+        return new JsonResponse<>(list);
     }
 
     /**

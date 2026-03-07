@@ -45,4 +45,6 @@ public interface UserDao {
     RefreshTokenDetail getRefreshTokenDetail(String refreshToken);
 
     List<UserInfo> batchGetUserInfoByUserIds(Set<Long> userIdList);
+
+    UserInfo selectUserInfoByUserId(Long userId);
 }

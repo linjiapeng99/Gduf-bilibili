@@ -39,7 +39,7 @@ public class ApiRoleLimitedAspect {
         Set<String>limitedRoleCodeSet= Arrays.stream(limitedRoleCodeList).collect(Collectors.toSet());
         Set<String> roleCodeSet = userRoleList.stream().map(UserRole::getRoleCode).collect(Collectors.toSet());
         roleCodeSet.retainAll(limitedRoleCodeSet);
-        if(!roleCodeSet.isEmpty()){
+        if(roleCodeSet.size() > 0){
             throw new ConditionException("权限不足！");
         }
     }

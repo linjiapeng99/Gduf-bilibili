@@ -72,4 +72,12 @@ public interface VideoDao {
     Integer batchAddBinaryPictures(List<VideoBinaryPicture> pictures);
 
     void updateVideoCollection(VideoCollection videoCollection);
+
+    List<Video> batchGetVideosByIds(@Param("idList") List<Long> idList);
+
+    void addVideoOperation(@Param("userId") Long userId,@Param("videoId") Long videoId,@Param("opType") String opType);
+
+    void deleteVideoOperation(@Param("userId") Long userId,@Param("videoId") Long videoId,@Param("opType") String opType);
+
+    Integer getOperationCoin(@Param("userId") Long userId,@Param("videoId") Long videoId,@Param("opType") String opType);
 }

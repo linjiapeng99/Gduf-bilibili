@@ -19,6 +19,9 @@
     <select id="getUserFans" parameterType="java.lang.Long" resultType="com.gduf.bilibili.domain.UserFollowing">
         select * from t_user_following where followingId=#{userId}
     </select>
+    <select id="getUserFansCount" resultType="java.lang.Integer">
+        select count(1) from t_user_following where followingId=#{userId}
+    </select>
 
     <update id="updateUserFollowings">
         update

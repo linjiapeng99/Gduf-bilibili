@@ -2,16 +2,14 @@ package com.gduf.bilibili.api;
 
 import com.gduf.bilibili.api.support.UserSupport;
 import com.gduf.bilibili.domain.JsonResponse;
+import com.gduf.bilibili.domain.PageResult;
 import com.gduf.bilibili.domain.UserMoments;
 import com.gduf.bilibili.domain.annotation.ApiLimitedRole;
 import com.gduf.bilibili.domain.annotation.DataLimitedRole;
 import com.gduf.bilibili.domain.constant.AuthRoleConstant;
 import com.gduf.bilibili.service.UserMomentsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,5 +48,15 @@ public class UserMomentsApi {
         Long userId = userSupport.getCurrentUserId();
         List<UserMoments> list = userMomentsService.getUserSubscribedMoments(userId);
         return JsonResponse.success(list);
+    }
+
+    @GetMapping("/moments")
+    public JsonResponse<PageResult<UserMoments>> pageListMoments(@RequestParam("size") Integer size,
+                                                                 @RequestParam("no") Integer no,
+                                                                 String type){
+        Long userId = userSupport.getCurrentUserId();
+        PageResult<UserMoments> list = userMomentsService.pageListMoments(size, no,
+                userId, type);
+        return new JsonResponse<>(list);
     }
 }

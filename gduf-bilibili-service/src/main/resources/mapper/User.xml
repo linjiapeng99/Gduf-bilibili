@@ -125,4 +125,8 @@
             #{userId}
         </foreach>
     </select>
+    <select id="selectUserInfoByUserId" resultType="com.gduf.bilibili.domain.UserInfo">
+        select * from t_user_info where userId=#{userId}
+    </select>
+
 </mapper>
