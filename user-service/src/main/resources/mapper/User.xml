@@ -55,7 +55,7 @@
             <if test="nick!=null and nick!=''">
                 nick=#{nick},
             </if>
-            <if test="avatar!=null">
+            <if test="avatar!=null and avatar!=''">
                 avatar=#{avatar},
             </if>
             <if test="sign!=null">

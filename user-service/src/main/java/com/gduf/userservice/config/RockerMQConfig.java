@@ -1,13 +1,11 @@
 package com.gduf.userservice.config;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.gduf.bilibilicommon.domain.UserFollowing;
 import com.gduf.bilibilicommon.domain.UserMoments;
 import com.gduf.bilibilicommon.domain.constant.UserMomentsConstant;
 import com.gduf.userservice.service.UserFollowingService;
-import com.gduf.userservice.websocket.WebSocketService;
 import com.mysql.cj.util.StringUtils;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -23,11 +21,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Configuration
+@Configuration
 public class RockerMQConfig {
     @Value("${rocketmq.name.server.address}")
     private String nameServerAddr;
@@ -80,49 +77,6 @@ public class RockerMQConfig {
                     redisTemplate.opsForValue().set(key,JSONObject.toJSONString(subScribedList));
 
                 }
-                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-            }
-        });
-        consumer.start();
-        return consumer;
-    }
-    //弹幕生产者
-    @Bean("danmusProducer")
-    public DefaultMQProducer danmusProducer() throws MQClientException {
-        DefaultMQProducer producer=new DefaultMQProducer(UserMomentsConstant.GRUOP_DANMUS);
-        producer.setNamesrvAddr(nameServerAddr);
-        producer.start();
-        return producer;
-    }
-
-    //弹幕消费者
-    @Bean("danmusConsumer")
-    public DefaultMQPushConsumer danmusConsumer() throws MQClientException {
-        DefaultMQPushConsumer consumer=new DefaultMQPushConsumer(UserMomentsConstant.GRUOP_MOMENTS);
-        consumer.setNamesrvAddr(nameServerAddr);
-        //消费者订阅
-        //参数一：订阅内容主题
-        //参数二：订阅内容二级主题，即下级分类
-        consumer.subscribe(UserMomentsConstant.TOPIC_DANMUS,"*");
-        //添加监听器
-        consumer.registerMessageListener(new MessageListenerConcurrently() {
-            @Override
-            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
-                MessageExt msg=msgs.get(0);
-                byte[] msgByte = msg.getBody();
-                String bodyStr = new String(msgByte);
-                JSONObject jsonObject= JSON.parseObject(bodyStr);
-                String sessionId = jsonObject.getString("sessionId");
-                String message=jsonObject.getString("message");
-                WebSocketService webSocketService=WebSocketService.WEBSOCKET_MAP.get(sessionId);
-                if(webSocketService.getSession().isOpen()){
-                    try {
-                        webSocketService.sendMessage(message);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                //该消息已被成功消费
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });

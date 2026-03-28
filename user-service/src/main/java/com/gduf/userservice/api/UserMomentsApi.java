@@ -29,8 +29,8 @@ public class UserMomentsApi {
      * @throws Exception
      */
     //limitedRoleCodeList = {AuthRoleConstant.ROLE_LV0}在这个列表中的角色不能访问这个接口
-    @ApiLimitedRole(limitedRoleCodeList = {AuthRoleConstant.ROLE_LV0})
-    @DataLimitedRole
+    //@ApiLimitedRole(limitedRoleCodeList = {AuthRoleConstant.ROLE_LV0})
+    //@DataLimitedRole
     @PostMapping("/user-moments")
     public JsonResponse<String> addUserMoments(@RequestBody UserMoments userMoments) throws Exception {
         Long userId = userSupport.getCurrentUserId();
